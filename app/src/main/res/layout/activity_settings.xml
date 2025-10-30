@@ -11,14 +11,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp">
+        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_small">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/back_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
+            android:layout_weight="@dimen/layout_weight_small"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             app:icon="@drawable/arrow_back_icon"
             app:iconGravity="textStart"
@@ -31,9 +31,9 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.5"
+            android:layout_weight="@dimen/layout_weight_large"
             android:text="@string/third_button_name"
-            android:textSize="22sp"
+            android:textSize="@dimen/text_size_title"
             android:textColor="@color/black_main"
             android:textAllCaps="false"
             android:textStyle="bold"/>
@@ -44,23 +44,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="21dp"
-        android:paddingBottom="21dp">
+        android:paddingTop="@dimen/padding_vertical_large"
+        android:paddingBottom="@dimen/padding_vertical_large">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1.5"
+            android:layout_marginStart="@dimen/margin_start_medium"
+            android:layout_weight="@dimen/layout_weight_large"
             android:text="@string/dark_theme_name"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_size_body"
             android:textColor="@color/black"
             android:textAllCaps="false" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"/>
+            android:layout_marginEnd="@dimen/margin_end_medium"/>
 
     </LinearLayout>
 
@@ -69,8 +69,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="21dp"
-        android:paddingBottom="21dp"
+        android:paddingTop="@dimen/padding_vertical_large"
+        android:paddingBottom="@dimen/padding_vertical_large"
         android:background="?selectableItemBackground"
         android:clickable="true"
         android:focusable="true">
@@ -78,17 +78,17 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1.5"
+            android:layout_marginStart="@dimen/margin_start_medium"
+            android:layout_weight="@dimen/layout_weight_large"
             android:text="@string/share_app_name"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_size_body"
             android:textColor="@color/black"
             android:textAllCaps="false" />
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
+            android:layout_weight="@dimen/layout_weight_small"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             app:icon="@drawable/share_icon"
             app:iconTint="@color/gray"
@@ -103,8 +103,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="21dp"
-        android:paddingBottom="21dp"
+        android:paddingTop="@dimen/padding_vertical_large"
+        android:paddingBottom="@dimen/padding_vertical_large"
         android:background="?selectableItemBackground"
         android:clickable="true"
         android:focusable="true">
@@ -112,17 +112,17 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1.5"
+            android:layout_marginStart="@dimen/margin_start_medium"
+            android:layout_weight="@dimen/layout_weight_large"
             android:text="@string/write_support_name"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_size_body"
             android:textColor="@color/black"
             android:textAllCaps="false" />
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
+            android:layout_weight="@dimen/layout_weight_small"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             app:icon="@drawable/support_icon"
             app:iconTint="@color/gray"
@@ -139,25 +139,25 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="?selectableItemBackground"
-        android:paddingTop="21dp"
-        android:paddingBottom="21dp"
+        android:paddingTop="@dimen/padding_vertical_large"
+        android:paddingBottom="@dimen/padding_vertical_large"
         android:clickable="true"
         android:focusable="true">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_weight="1.5"
+            android:layout_marginStart="@dimen/margin_start_medium"
+            android:layout_weight="@dimen/layout_weight_large"
             android:text="@string/user_agreement_name"
-            android:textSize="16sp"
+            android:textSize="@dimen/text_size_body"
             android:textColor="@color/black"
             android:textAllCaps="false" />
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.3"
+            android:layout_weight="@dimen/layout_weight_small"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             app:icon="@drawable/arrow_forward_icon"
             app:iconTint="@color/gray"
