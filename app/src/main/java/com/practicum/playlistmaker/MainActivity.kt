@@ -22,10 +22,10 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val firstButton = findViewById<Button>(R.id.search_button)
+        val searchButton = findViewById<Button>(R.id.search_button)
 
         // Способ 1: Анонимный класс
-        val firstButtonClickListener: View.OnClickListener = object : View.OnClickListener {
+        val searchButtonClickListener: View.OnClickListener = object : View.OnClickListener {
             override fun onClick(v: View?) {
                 val intent = Intent(
                     this@MainActivity,
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Способ 2: Лямбда-выражение
-        firstButton.setOnClickListener {
+        searchButton .setOnClickListener {
             val intent = Intent(
                 this,
                 SearchActivity::class.java
@@ -44,12 +44,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        firstButton.setOnClickListener(firstButtonClickListener)
+        searchButton .setOnClickListener(searchButtonClickListener)
 
-        val secondButton = findViewById<Button>(R.id.media_button)
+        val mediaButton = findViewById<Button>(R.id.media_button)
 
         // Способ 1: Анонимный класс
-        val secondButtonClickListener: View.OnClickListener = object : View.OnClickListener {
+        val mediaButtonClickListener: View.OnClickListener = object : View.OnClickListener {
             override fun onClick(v: View?) {
                 val intent = Intent(
                     this@MainActivity,
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Способ 2: Лямбда-выражение
-        secondButton.setOnClickListener {
+        mediaButton.setOnClickListener {
             val intent = Intent(
                 this,
                 MediaActivity::class.java
@@ -68,12 +68,12 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        secondButton.setOnClickListener(secondButtonClickListener)
+        mediaButton.setOnClickListener(mediaButtonClickListener)
 
         // Третья кнопка - используем лямбда
-        val thirdButton = findViewById<Button>(R.id.settings_button)
+        val settingsButton = findViewById<Button>(R.id.settings_button)
 
-        thirdButton.setOnClickListener {
+        settingsButton.setOnClickListener {
             val intent = Intent(
                 this,
                 SettingsActivity::class.java

@@ -5,15 +5,12 @@
     <dimen name="margin_large">40dp</dimen>
     <dimen name="margin_medium">16dp</dimen>
     <dimen name="text_size_large">22sp</dimen>
-    <dimen name="text_size_medium">16sp</dimen>
     <dimen name="button_corner_radius">16dp</dimen>
     <dimen name="icon_padding">8dp</dimen>
-    <dimen name="button_bottom_margin">28dp</dimen>
-    <dimen name="margin_small">12dp</dimen>
-    <dimen name="padding_vertical_large">21dp</dimen>
+    <dimen name="margin_small">14dp</dimen>
     <dimen name="margin_end_medium">16dp</dimen>
     <dimen name="text_size_title">22sp</dimen>
     <dimen name="text_size_body">16sp</dimen>
-    <dimen name="layout_weight_large">1.5</dimen>
-    <dimen name="layout_weight_small">0.3</dimen>
+    <dimen name="layout_weight_large">1</dimen>
+    <dimen name="layout_weight_small">0.1</dimen>
 </resources>
