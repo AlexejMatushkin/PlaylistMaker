@@ -7,10 +7,16 @@
     <dimen name="text_size_large">22sp</dimen>
     <dimen name="button_corner_radius">16dp</dimen>
     <dimen name="icon_padding">8dp</dimen>
-    <dimen name="margin_small">14dp</dimen>
+    <dimen name="margin_small">4dp</dimen>
     <dimen name="margin_end_medium">16dp</dimen>
     <dimen name="text_size_title">22sp</dimen>
     <dimen name="text_size_body">16sp</dimen>
     <dimen name="layout_weight_large">1</dimen>
     <dimen name="layout_weight_small">0.1</dimen>
+    <dimen name="padding_vertical_item">21dp</dimen>
+    <dimen name="padding_text_vertical">12dp</dimen>
+    <dimen name="padding_text_start">12dp</dimen>
+    <dimen name="padding_text_top">10dp</dimen>
+    <dimen name="button_size">48dp</dimen>
+    <dimen name="padding_horizontal">16dp</dimen>
 </resources>
