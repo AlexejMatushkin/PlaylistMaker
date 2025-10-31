@@ -48,7 +48,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingStart="@dimen/padding_horizontal"
-        android:paddingEnd="@dimen/padding_horizontal">
+        android:paddingEnd="@dimen/padding_horizontal"
+        android:layout_marginTop="20dp">
 
         <TextView
             android:layout_width="0dp"
