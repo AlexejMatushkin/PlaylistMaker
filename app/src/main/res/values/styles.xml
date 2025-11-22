@@ -15,35 +15,25 @@
         <item name="android:fontFamily">@font/ys_display_medium</item>
     </style>
 
-    <style name="SettingsLayoutButton">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:orientation">horizontal</item>
-        <item name="android:background">?selectableItemBackground</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-        <item name="android:layout_marginTop">@dimen/padding_vertical_item</item>
-        <item name="android:paddingStart">@dimen/padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/padding_horizontal</item>
-    </style>
-
-    <style name="SettingsTextButton">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">@dimen/layout_weight_large</item>
-        <item name="android:textSize">@dimen/text_size_body</item>
-        <item name="android:textColor">@color/black</item>
+    <style name="SettingsTitleTextAppearance" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">@dimen/text_size_title</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:fontFamily">@font/ys_display_regular</item>
     </style>
 
-    <style name="SettingsButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">@dimen/layout_weight_small</item>
-        <item name="iconTint">@color/gray</item>
+    <style name="SearchTitleTextAppearance" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">@dimen/text_size_title</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:paddingStart">@dimen/padding_text_start</item>
+        <item name="android:paddingTop">@dimen/padding_text_top</item>
+        <item name="android:paddingBottom">@dimen/padding_text_vertical</item>
     </style>
-    
+
     <style name="SearchContainerStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>

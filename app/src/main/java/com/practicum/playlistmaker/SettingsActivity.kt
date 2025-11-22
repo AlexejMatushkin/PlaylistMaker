@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.net.toUri
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,13 +24,13 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        findViewById<com.google.android.material.button.MaterialButton>(
-            R.id.back_button
-        ).setOnClickListener {
+        findViewById<MaterialToolbar>(
+            R.id.back_toolbar_settings
+        ).setNavigationOnClickListener {
             finish()
         }
 
-        findViewById<LinearLayout>(
+        findViewById<MaterialTextView>(
             R.id.share_button
         ).setOnClickListener {
             val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -44,7 +46,7 @@ class SettingsActivity : AppCompatActivity() {
             )
         }
 
-        findViewById<LinearLayout>(
+        findViewById<MaterialTextView>(
             R.id.support_button
         ).setOnClickListener {
             val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
@@ -65,7 +67,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(emailIntent)
         }
 
-        findViewById<LinearLayout>(
+        findViewById<MaterialTextView>(
             R.id.agreement_button
         ).setOnClickListener {
             val agreementUri = getString(R.string.user_agreement_url).toUri()

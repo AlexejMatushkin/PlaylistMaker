@@ -11,6 +11,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 
 class SearchActivity : AppCompatActivity() {
@@ -28,7 +30,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val searchEditText = findViewById<EditText>(R.id.search_edit_text)
-        val searchBackButton = findViewById<MaterialButton>(R.id.search_back_button)
+        val searchBackButton = findViewById<MaterialToolbar>(R.id.toolbar_search)
         val searchClearButton = findViewById<ImageButton>(R.id.search_clear_button)
 
         searchEditText.apply {
@@ -41,7 +43,7 @@ class SearchActivity : AppCompatActivity() {
 
         searchEditText.requestFocus()
 
-        searchBackButton.setOnClickListener {
+        searchBackButton.setNavigationOnClickListener {
             finish()
         }
 
@@ -63,11 +65,7 @@ class SearchActivity : AppCompatActivity() {
 
                 searchText = s?.toString() ?: ""
 
-                searchClearButton.visibility = if (s.isNullOrEmpty()) {
-                    ImageButton.GONE
-                } else {
-                    ImageButton.VISIBLE
-                }
+                searchClearButton.isVisible = !s.isNullOrEmpty()
                 // Заглушка для будущей логики поиска
                 // TODO: добавить логику поиска здесь
             }
@@ -94,11 +92,7 @@ class SearchActivity : AppCompatActivity() {
         searchText = restoredText
 
         val searchClearButton = findViewById<ImageButton>(R.id.search_clear_button)
-        searchClearButton.visibility = if (restoredText.isNotEmpty()) {
-            ImageButton.VISIBLE
-        } else {
-            ImageButton.GONE
-        }
+        searchClearButton.isVisible =  restoredText.isNotEmpty()
     }
 
     companion object {

@@ -6,112 +6,87 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurface"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".SettingsActivity">
 
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/back_toolbar_settings"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="?attr/actionBarSize"
         android:layout_marginTop="@dimen/margin_small"
         android:layout_marginBottom="@dimen/margin_small"
-        android:layout_marginStart="@dimen/margin_small"
-        android:gravity="center_vertical">
+        app:title="@string/third_button_name"
+        app:titleTextAppearance="@style/SettingsTitleTextAppearance"
+        app:navigationIcon="@drawable/ic_arrow_back_24"
+        app:navigationIconTint="?attr/colorOnSurface"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/back_button"
-            android:layout_width="@dimen/button_size"
-            android:layout_height="@dimen/button_size"
-            android:layout_gravity="center_vertical"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            app:icon="@drawable/ic_arrow_back_24"
-            app:iconGravity="textStart"
-            app:iconTint="?attr/colorOnSurface"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingBottom="@dimen/padding_text_vertical"
-            android:paddingStart="@dimen/padding_text_start"
-            android:paddingTop="@dimen/padding_text_top"
-            android:text="@string/third_button_name"
-            android:textAllCaps="false"
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="@dimen/text_size_title"
-            android:textStyle="bold"
-            tools:ignore="RtlSymmetry"
-            android:fontFamily="@font/ys_display_medium"/>
-
-    </LinearLayout>
-
-    <LinearLayout
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/theme_switch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingStart="@dimen/padding_horizontal"
         android:paddingEnd="@dimen/padding_horizontal"
-        android:layout_marginTop="20dp">
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:text="@string/dark_theme_name"
+        android:textSize="@dimen/text_size_body"
+        android:textColor="?attr/colorOnSurface"
+        android:fontFamily="@font/ys_display_regular"
+        android:checked="true"/>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="@dimen/layout_weight_large"
-            android:text="@string/dark_theme_name"
-            android:textSize="@dimen/text_size_body"
-            android:textColor="?attr/colorOnSurface"
-            android:textAllCaps="false"
-            android:fontFamily="@font/ys_display_regular"/>
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/theme_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="0dp"
-            android:checked="true" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/share_button"
-        style="@style/SettingsLayoutButton">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/ic_share_24"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/padding_horizontal"
+        android:paddingEnd="@dimen/padding_horizontal"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/share_app_name"
+        android:textSize="@dimen/text_size_body"
+        android:textColor="?attr/colorOnSurface"
+        android:fontFamily="@font/ys_display_regular"
+        android:clickable="true"
+        android:focusable="true"
+        style="?attr/materialThemeOverlay"/>
 
-        <TextView
-            android:text="@string/share_app_name"
-            style="@style/SettingsTextButton"/>
-
-        <com.google.android.material.button.MaterialButton
-            app:icon="@drawable/ic_share_24"
-            style="@style/SettingsButtonStyle"/>
-
-    </LinearLayout>
-
-    <LinearLayout
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/support_button"
-        style="@style/SettingsLayoutButton">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/ic_support_24"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/padding_horizontal"
+        android:paddingEnd="@dimen/padding_horizontal"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/write_support_name"
+        android:textSize="@dimen/text_size_body"
+        android:textColor="?attr/colorOnSurface"
+        android:fontFamily="@font/ys_display_regular"
+        android:clickable="true"
+        android:focusable="true"
+        style="?attr/materialThemeOverlay" />
 
-        <TextView
-            android:text="@string/write_support_name"
-            style="@style/SettingsTextButton" />
-
-        <com.google.android.material.button.MaterialButton
-            app:icon="@drawable/ic_support_24"
-            style="@style/SettingsButtonStyle"/>
-
-    </LinearLayout>
-
-    <LinearLayout
+    <com.google.android.material.textview.MaterialTextView
         android:id="@+id/agreement_button"
-        style="@style/SettingsLayoutButton">
-
-        <TextView
-            android:text="@string/user_agreement_name"
-            style="@style/SettingsTextButton" />
-
-        <com.google.android.material.button.MaterialButton
-            app:icon="@drawable/ic_arrow_forward_24"
-            style="@style/SettingsButtonStyle"/>
-
-    </LinearLayout>
-
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/ic_arrow_forward_24"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/padding_horizontal"
+        android:paddingEnd="@dimen/padding_horizontal"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:text="@string/user_agreement_name"
+        android:textSize="@dimen/text_size_body"
+        android:textColor="?attr/colorOnSurface"
+        android:fontFamily="@font/ys_display_regular"
+        android:clickable="true"
+        android:focusable="true"
+        style="?attr/materialThemeOverlay" />
 
 </LinearLayout>
