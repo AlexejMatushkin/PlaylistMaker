@@ -15,6 +15,10 @@ class TrackAdapter(
     private val data: List<Track>
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
+    companion object {
+        private const val CORNER_RADIUS_PX = 2f
+    }
+
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvTrackName: TextView = itemView.findViewById(R.id.tvTrackName)
         private val tvArtistName: TextView = itemView.findViewById(R.id.tvArtistName)
@@ -26,7 +30,7 @@ class TrackAdapter(
             tvArtistName.text = track.artistName
             tvTrackTime.text = track.trackTime
 
-            val cornerRadius = pxToDp(2f, itemView.context)
+            val cornerRadius = pxToDp(CORNER_RADIUS_PX, itemView.context)
 
             Glide.with(itemView.context)
                 .load(track.artworkUrl100)
