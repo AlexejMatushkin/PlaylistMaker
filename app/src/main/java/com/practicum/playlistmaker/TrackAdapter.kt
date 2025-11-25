@@ -1,7 +1,5 @@
 package com.practicum.playlistmaker
 
-import android.content.Context
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,7 +28,10 @@ class TrackAdapter(
             tvArtistName.text = track.artistName
             tvTrackTime.text = track.trackTime
 
-            val cornerRadius = pxToDp(CORNER_RADIUS_PX, itemView.context)
+            val cornerRadius = DimensionUtils.pxToDp(
+                CORNER_RADIUS_PX,
+                itemView.context
+            )
 
             Glide.with(itemView.context)
                 .load(track.artworkUrl100)
@@ -40,13 +41,6 @@ class TrackAdapter(
                 .into(ivArtwork)
         }
 
-        private fun pxToDp(px: Float, context: Context): Int {
-            return TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                px,
-                context.resources.displayMetrics
-            ).toInt()
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {

@@ -8,11 +8,11 @@
 
     <ImageView
         android:id="@+id/ivArtwork"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginStart="13dp"
+        android:layout_width="@dimen/track_artwork_size"
+        android:layout_height="@dimen/track_artwork_size"
+        android:layout_marginTop="@dimen/track_artwork_margin_top"
+        android:layout_marginBottom="@dimen/track_artwork_margin_bottom"
+        android:layout_marginStart="@dimen/track_artwork_margin_start"
         android:scaleType="centerCrop"
         tools:ignore="ContentDescription" />
 
@@ -21,17 +21,17 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:layout_marginTop="14dp"
-        android:layout_marginBottom="14dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp">
+        android:layout_marginTop="@dimen/track_text_container_margin_top"
+        android:layout_marginBottom="@dimen/track_text_container_margin_bottom"
+        android:layout_marginStart="@dimen/track_text_container_margin_start"
+        android:layout_marginEnd="@dimen/track_text_container_margin_end">
 
         <TextView
             android:id="@+id/tvTrackName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="1dp"
-            android:textSize="16sp"
+            android:textSize="@dimen/track_name_text_size"
             android:maxLines="1"
             android:ellipsize="end"
             android:singleLine="true"
@@ -46,9 +46,9 @@
 
             <TextView
                 android:id="@+id/tvArtistName"
-                android:layout_width="54dp"
+                android:layout_width="@dimen/track_artist_width"
                 android:layout_height="wrap_content"
-                android:textSize="11sp"
+                android:textSize="@dimen/track_secondary_text_size"
                 android:fontFamily="@font/ys_display_regular"
                 android:maxLines="1"
                 android:ellipsize="end"
@@ -67,7 +67,7 @@
                     android:id="@+id/tvTrackTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="11sp"
+                    android:textSize="@dimen/track_secondary_text_size"
                     android:fontFamily="@font/ys_display_regular"
                     android:textColor="?attr/colorOnSurfaceVariant"/>
 
@@ -80,8 +80,8 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_arrow_forward_24"
             tools:ignore="ContentDescription"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="19dp"
-            android:layout_marginEnd="12dp"/>
+            android:layout_marginTop="@dimen/track_arrow_margin_top"
+            android:layout_marginBottom="@dimen/track_arrow_margin_bottom"
+            android:layout_marginEnd="@dimen/track_arrow_margin_end"/>
 
 </LinearLayout>
