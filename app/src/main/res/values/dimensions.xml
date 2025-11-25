@@ -19,4 +19,28 @@
     <dimen name="padding_text_top">10dp</dimen>
     <dimen name="button_size">48dp</dimen>
     <dimen name="padding_horizontal">16dp</dimen>
+
+    <!-- Размеры обложки -->
+    <dimen name="track_artwork_size">45dp</dimen>
+    <dimen name="track_artwork_margin_top">8dp</dimen>
+    <dimen name="track_artwork_margin_bottom">8dp</dimen>
+    <dimen name="track_artwork_margin_start">13dp</dimen>
+
+    <!-- Отступы контейнера с текстом -->
+    <dimen name="track_text_container_margin_top">14dp</dimen>
+    <dimen name="track_text_container_margin_bottom">14dp</dimen>
+    <dimen name="track_text_container_margin_start">8dp</dimen>
+    <dimen name="track_text_container_margin_end">8dp</dimen>
+
+    <!-- Отступы стрелки -->
+    <dimen name="track_arrow_margin_top">18dp</dimen>
+    <dimen name="track_arrow_margin_bottom">19dp</dimen>
+    <dimen name="track_arrow_margin_end">12dp</dimen>
+
+    <!-- Размеры текста -->
+    <dimen name="track_name_text_size">16sp</dimen>
+    <dimen name="track_secondary_text_size">11sp</dimen>
+
+    <!-- Ширина имени исполнителя -->
+    <dimen name="track_artist_width">54dp</dimen>
 </resources>

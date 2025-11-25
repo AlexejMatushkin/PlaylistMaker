@@ -36,6 +36,8 @@ app/
 ├── SearchActivity.kt        # Поиск музыки  
 ├── MediaActivity.kt         # Медиатека
 └── SettingsActivity.kt      # Настройки приложения
+└── Track.kt                 # Дата класс
+└── TrackAdapter.kt          # Адаптер треков
 ```
 
 ---

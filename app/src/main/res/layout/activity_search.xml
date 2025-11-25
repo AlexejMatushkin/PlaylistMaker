@@ -16,8 +16,7 @@
             android:layout_marginBottom="@dimen/margin_small"
             app:title="@string/search_title"
             app:titleTextAppearance="@style/SearchTitleTextAppearance"
-            app:navigationIcon="@drawable/ic_arrow_back_24"
-            app:navigationIconTint="?attr/colorOnSurface"/>
+            app:navigationIcon="@drawable/ic_arrow_back_24"/>
 
     <FrameLayout
         style="@style/SearchContainerStyle">
@@ -37,5 +36,11 @@
             android:visibility="gone"
             tools:ignore="ContentDescription"/>
     </FrameLayout>
+    
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTracks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"/>
 
 </LinearLayout>
