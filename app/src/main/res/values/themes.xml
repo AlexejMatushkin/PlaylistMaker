@@ -6,7 +6,6 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSurface">@color/white</item>
         <item name="colorOnSurface">@color/black_main</item>
-        <item name="colorOnSurfaceVariant">@color/gray</item>
         <item name="android:windowBackground">@color/white</item>
     </style>
 
