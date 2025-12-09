@@ -15,24 +15,4 @@
     <string name="user_agreement_url">https://yandex.ru/legal/practicum_offer/ru</string>
     <string name="search_title">Поиск</string>
     <string name="search_hint">Поиск</string>
-
-    <string name="track_1_name">Smells like Teen Spirit</string>
-    <string name="track_1_artist">Nirvana</string>
-    <string name="track_1_time">5:01</string>
-
-    <string name="track_2_name">Billie Jean</string>
-    <string name="track_2_artist">Michael Jackson</string>
-    <string name="track_2_time">4:35</string>
-
-    <string name="track_3_name">Stayin\' Alive</string>
-    <string name="track_3_artist">Bee Gees</string>
-    <string name="track_3_time">4:10</string>
-
-    <string name="track_4_name">Whole Lotta Love</string>
-    <string name="track_4_artist">Led Zeppelin</string>
-    <string name="track_4_time">5:33</string>
-
-    <string name="track_5_name">Sweet Child O\'Mine</string>
-    <string name="track_5_artist">Guns N\' Roses</string>
-    <string name="track_5_time">5:03</string>
 </resources>
