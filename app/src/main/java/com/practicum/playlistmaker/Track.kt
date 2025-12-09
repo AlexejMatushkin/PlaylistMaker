@@ -1,17 +1,8 @@
 package com.practicum.playlistmaker
 
-import java.text.SimpleDateFormat
-import java.util.Locale
-
 data class Track(
     val trackName: String,
     val artistName: String,
-    val trackTimeMillis: Long?, // nullable
-    val artworkUrl100: String?
-) {
-    fun getFormattedTime(): String {
-        return trackTimeMillis?.let {
-            SimpleDateFormat("mm:ss", Locale.getDefault()).format(it)
-        } ?: ""
-    }
-}
+    val trackTime: String,
+    val artworkUrl100: String
+)

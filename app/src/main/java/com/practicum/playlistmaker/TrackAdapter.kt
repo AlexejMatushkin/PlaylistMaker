@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 class TrackAdapter(
-    private var tracks: List<Track> = emptyList()
+    private val data: List<Track>
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     companion object {
@@ -27,24 +26,19 @@ class TrackAdapter(
         fun bind(track: Track) {
             tvTrackName.text = track.trackName
             tvArtistName.text = track.artistName
-            tvTrackTime.text = track.getFormattedTime()
+            tvTrackTime.text = track.trackTime
 
             val cornerRadius = DimensionUtils.pxToDp(
                 CORNER_RADIUS_PX,
                 itemView.context
             )
 
-            if (!track.artworkUrl100.isNullOrEmpty()) {
-                Glide.with(itemView.context)
-                    .load(track.artworkUrl100)
-                    .placeholder(R.drawable.ic_music_note)
-                    .error(R.drawable.ic_placeholder_error_track)
-                    .centerCrop()
-                    .transform(RoundedCorners(cornerRadius))
-                    .into(ivArtwork)
-            } else {
-                ivArtwork.setImageResource(R.drawable.ic_music_note)
-            }
+            Glide.with(itemView.context)
+                .load(track.artworkUrl100)
+                .placeholder(R.drawable.ic_music_note)
+                .centerCrop()
+                .transform(RoundedCorners(cornerRadius))
+                .into(ivArtwork)
         }
 
     }
@@ -56,14 +50,9 @@ class TrackAdapter(
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
-        holder.bind(tracks[position])
+        holder.bind(data[position])
     }
 
-    override fun getItemCount(): Int = tracks.size
+    override fun getItemCount(): Int = data.size
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateData(newTracks: List<Track>) {
-        tracks = newTracks
-        notifyDataSetChanged()
-    }
 }
