@@ -12,12 +12,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 
 class SearchActivity : AppCompatActivity() {
 
     private var searchText: String = ""
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var trackAdapter: TrackAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +36,9 @@ class SearchActivity : AppCompatActivity() {
         val searchEditText = findViewById<EditText>(R.id.search_edit_text)
         val searchBackButton = findViewById<MaterialToolbar>(R.id.toolbar_search)
         val searchClearButton = findViewById<ImageButton>(R.id.search_clear_button)
+        recyclerView = findViewById(R.id.rvTracks)
+
+        setupRecyclerView()
 
         searchEditText.apply {
             hint = getString(R.string.search_hint)
@@ -74,6 +81,48 @@ class SearchActivity : AppCompatActivity() {
                 // Не используется
             }
         })
+    }
+
+    private fun setupRecyclerView() {
+        val trackList = createTrackList()
+        trackAdapter = TrackAdapter(trackList)
+        recyclerView.adapter = trackAdapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun createTrackList(): List<Track> {
+        return listOf(
+            Track(
+                getString(R.string.track_1_name),
+                getString(R.string.track_1_artist),
+                getString(R.string.track_1_time),
+                getString(R.string.track_1_url)
+            ),
+            Track(
+                getString(R.string.track_2_name),
+                getString(R.string.track_2_artist),
+                getString(R.string.track_2_time),
+                getString(R.string.track_2_url)
+            ),
+            Track(
+                getString(R.string.track_3_name),
+                getString(R.string.track_3_artist),
+                getString(R.string.track_3_time),
+                getString(R.string.track_3_url)
+            ),
+            Track(
+                getString(R.string.track_4_name),
+                getString(R.string.track_4_artist),
+                getString(R.string.track_4_time),
+                getString(R.string.track_4_url)
+            ),
+            Track(
+                getString(R.string.track_5_name),
+                getString(R.string.track_5_artist),
+                getString(R.string.track_5_time),
+                getString(R.string.track_5_url)
+            )
+        )
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
