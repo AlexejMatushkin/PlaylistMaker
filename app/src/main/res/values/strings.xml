@@ -35,4 +35,9 @@
     <string name="track_5_name">Sweet Child O\'Mine</string>
     <string name="track_5_artist">Guns N\' Roses</string>
     <string name="track_5_time">5:03</string>
+
+    <string name="retry">Обновить</string>
+    <string name="nothing_found">Ничего не нашлось</string>
+    <string name="something_went_wrong">Проблемы со связью \nЗагрузка не удалась.Проверьте \nподключение к интернету</string>
+
 </resources>
