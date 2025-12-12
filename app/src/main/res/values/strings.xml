@@ -38,6 +38,6 @@
 
     <string name="retry">Обновить</string>
     <string name="nothing_found">Ничего не нашлось</string>
-    <string name="something_went_wrong">Проблемы со связью \nЗагрузка не удалась.Проверьте \nподключение к интернету</string>
+    <string name="something_went_wrong">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
 
 </resources>

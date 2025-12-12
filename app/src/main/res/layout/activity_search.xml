@@ -16,6 +16,7 @@
             android:layout_marginBottom="@dimen/margin_small"
             app:title="@string/search_title"
             app:titleTextAppearance="@style/SearchTitleTextAppearance"
+            app:navigationIconTint="?attr/colorOnSurface"
             app:navigationIcon="@drawable/ic_arrow_back_24"/>
 
     <FrameLayout
@@ -60,7 +61,6 @@
         android:orientation="vertical"
         android:layout_gravity="center"
         android:gravity="center_horizontal"
-        android:paddingHorizontal="120dp"
         android:paddingTop="102dp"
         android:visibility="gone">
 

@@ -13,9 +13,14 @@ class SearchRepository(private val apiService: iTunesApiService) {
         val call = apiService.search(query)
         call.enqueue(object : Callback<SearchResponse> {
             override fun onResponse(call: Call<SearchResponse>, response: Response<SearchResponse>) {
-                if (response.isSuccessful && response.body() != null) {
-                    val tracks = response.body()!!.results.mapNotNull { it.toTrack() }
-                    callback.onSuccess(tracks)
+                if (response.isSuccessful) {
+                    val searchResponse = response.body()
+                    if (searchResponse != null) {
+                        val tracks = searchResponse.results.mapNotNull { it.toTrack() }
+                        callback.onSuccess(tracks)
+                    } else {
+                        callback.onError("Server error: empty response")
+                    }
                 } else {
                     callback.onError("Server error: ${response.code()}")
                 }

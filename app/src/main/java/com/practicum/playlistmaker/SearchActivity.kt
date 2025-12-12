@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -23,6 +24,11 @@ import com.google.android.material.button.MaterialButton
 import java.util.concurrent.atomic.AtomicBoolean
 
 class SearchActivity : AppCompatActivity() {
+
+    companion object {
+        private const val KEY_SEARCH_TEXT = "SEARCH_TEXT"
+        private const val KEY_LAST_SEARCH_QUERY = "LAST_SEARCH_QUERY"
+    }
 
     private lateinit var searchEditText: EditText
     private lateinit var searchClearButton: ImageButton
@@ -88,16 +94,10 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        searchEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchText = s?.toString() ?: ""
-                searchClearButton.isVisible = searchText.isNotEmpty()
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
+        searchEditText.doOnTextChanged { text, _, _, _ ->
+            searchText = text?.toString() ?: ""
+            searchClearButton.isVisible = searchText.isNotEmpty()
+        }
 
         searchClearButton.setOnClickListener {
             clearSearch()
@@ -112,22 +112,22 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showEmptyScreen() {
-        recyclerView.visibility = View.GONE
-        placeholderContainer.visibility = View.GONE
-        progressBar.visibility = View.GONE
+        recyclerView.isVisible = false
+        placeholderContainer.isVisible = false
+        progressBar.isVisible = false
     }
 
     private fun clearSearch() {
         searchEditText.text.clear()
-        searchClearButton.visibility = View.GONE
+        searchClearButton.isVisible = false
 
         val imm =
             getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
 
-        recyclerView.visibility = View.GONE
+        recyclerView.isVisible = false
 
-        placeholderContainer.visibility = View.GONE
+        placeholderContainer.isVisible = false
     }
 
     private fun performSearch(query: String) {
@@ -165,37 +165,39 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showLoading() {
-        recyclerView.visibility = View.GONE
-        placeholderContainer.visibility = View.GONE
-        progressBar.visibility = View.VISIBLE
+        recyclerView.isVisible = false
+        placeholderContainer.isVisible = false
+        progressBar.isVisible = true
     }
 
     private fun showTracks(tracks: List<Track>) {
-        progressBar.visibility = View.GONE
-        placeholderContainer.visibility = View.GONE
-        recyclerView.visibility = View.VISIBLE
+        progressBar.isVisible = false
+        placeholderContainer.isVisible = false
+        recyclerView.isVisible = true
 
         trackAdapter.updateData(tracks)
     }
 
     private fun showNoResultsPlaceholder() {
-        progressBar.visibility = View.GONE
-        recyclerView.visibility = View.GONE
-        placeholderContainer.visibility = View.VISIBLE
+        progressBar.isVisible = false
+        recyclerView.isVisible = false
+        placeholderContainer.isVisible = true
 
         placeholderImage.setImageResource(R.drawable.ic_placeholder_no_results)
         placeholderText.text = getString(R.string.nothing_found)
-        retryButton.visibility = View.GONE
+        retryButton.isVisible = false
     }
 
     private fun showErrorPlaceholder() {
-        progressBar.visibility = View.GONE
-        recyclerView.visibility = View.GONE
-        placeholderContainer.visibility = View.VISIBLE
+        progressBar.isVisible = false
+        recyclerView.isVisible = false
+        placeholderContainer.isVisible = true
 
         placeholderImage.setImageResource(R.drawable.ic_placeholder_error_track)
         placeholderText.text = getString(R.string.something_went_wrong)
-        retryButton.visibility = View.VISIBLE
+        placeholderText.maxLines = 4
+        retryButton.isVisible = true
+        retryButton.isAllCaps = false
 
         retryButton.setOnClickListener {
             if (lastSearchQuery.isNotEmpty()) {
@@ -206,16 +208,16 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString("SEARCH_TEXT", searchText)
-        outState.putString("LAST_SEARCH_QUERY", lastSearchQuery)
+        outState.putString(KEY_SEARCH_TEXT, searchText)
+        outState.putString(KEY_LAST_SEARCH_QUERY, lastSearchQuery)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        val restoredText = savedInstanceState.getString("SEARCH_TEXT", "")
+        val restoredText = savedInstanceState.getString(KEY_SEARCH_TEXT, "")
         val restoredLastQuery = savedInstanceState.getString(
-            "LAST_SEARCH_QUERY",
+            KEY_LAST_SEARCH_QUERY,
             ""
         )
         searchText = restoredText
