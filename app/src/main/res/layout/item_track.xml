@@ -33,45 +33,46 @@
             android:layout_marginBottom="1dp"
             android:textSize="@dimen/track_name_text_size"
             android:maxLines="1"
-            android:ellipsize="end"
             android:singleLine="true"
+            android:ellipsize="end"
             android:textColor="?attr/colorOnSurface"
             android:fontFamily="@font/ys_display_regular" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvArtistName"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.3"
+                android:layout_weight="1"
                 android:textSize="14sp"
                 android:fontFamily="@font/ys_display_regular"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:textColor="?attr/colorOnSurfaceVariant"/>
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="Artist nameArtist Artist nameArtist nameArtist Artist nameArtist nameArtist Artist name"/>
 
             <ImageView
                 android:src="@drawable/ic_point_13"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
+                android:layout_height="wrap_content"
                 app:tint="?attr/colorOnSurfaceVariant"
                 tools:ignore="ContentDescription"/>
 
                 <TextView
                     android:id="@+id/tvTrackTime"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.9"
+                    android:layout_weight="0"
                     android:textSize="@dimen/track_secondary_text_size"
                     android:fontFamily="@font/ys_display_regular"
                     android:textColor="?attr/colorOnSurfaceVariant"
-                    tools:ignore="RtlSymmetry" />
+                    tools:ignore="RtlSymmetry"
+                    tools:text="04:34"/>
 
             </LinearLayout>
 
