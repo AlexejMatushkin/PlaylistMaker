@@ -1,16 +1,13 @@
 package com.practicum.playlistmaker
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.InputFilter
 import android.view.View
-import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.ImageButton
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -39,8 +36,15 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderText: TextView
     private lateinit var retryButton: MaterialButton
 
+    private lateinit var searchHistoryContainer: View
+    private lateinit var searchHistoryTitle: TextView
+    private lateinit var searchHistoryRecyclerView: RecyclerView
+    private lateinit var searchHistoryClearButton: MaterialButton
+
     private lateinit var trackAdapter: TrackAdapter
+    private lateinit var historyAdapter: TrackAdapter
     private val repository = SearchRepository(iTunesApiService.create())
+    private lateinit var searchHistory: SearchHistory
 
     private var searchText: String = ""
     private var isSearchInProgress = AtomicBoolean(false)
@@ -56,11 +60,21 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
+        searchHistory = SearchHistory(
+            getSharedPreferences("playlist_maker", MODE_PRIVATE)
+        )
+
         initViews()
+        setupButtons()
         setupRecyclerView()
         setupSearchField()
         setupToolbar()
         showEmptyScreen()
+    }
+
+    private fun setupButtons() {
+        searchHistoryClearButton.isAllCaps = false
+
     }
 
     private fun initViews() {
@@ -72,12 +86,33 @@ class SearchActivity : AppCompatActivity() {
         placeholderImage = findViewById(R.id.placeholderImage)
         placeholderText = findViewById(R.id.placeholderText)
         retryButton = findViewById(R.id.retryButton)
+
+        searchHistoryContainer = findViewById(R.id.searchHistoryContainer)
+        searchHistoryTitle = findViewById(R.id.searchHistoryTitle)
+        searchHistoryRecyclerView = findViewById(R.id.searchHistoryRecyclerView)
+        searchHistoryClearButton = findViewById(R.id.searchHistoryClearButton)
     }
 
     private fun setupRecyclerView() {
+        val itemClickListener = object : TrackAdapter.OnItemClickListener {
+            override fun onItemClick(track: Track) {
+                handleTrackClick(track)
+            }
+        }
+
         trackAdapter = TrackAdapter()
+        trackAdapter.setOnItemClickListener(itemClickListener)
         recyclerView.adapter = trackAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        historyAdapter = TrackAdapter()
+        historyAdapter.setOnItemClickListener(itemClickListener)
+        searchHistoryRecyclerView.adapter = historyAdapter
+        searchHistoryRecyclerView.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun handleTrackClick(track: Track) {
+        searchHistory.addTrack(track)
+        updateHistoryVisibility()
     }
 
     private fun setupSearchField() {
@@ -97,10 +132,21 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.doOnTextChanged { text, _, _, _ ->
             searchText = text?.toString() ?: ""
             searchClearButton.isVisible = searchText.isNotEmpty()
+
+            updateHistoryVisibility()
+        }
+
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            updateHistoryVisibility()
         }
 
         searchClearButton.setOnClickListener {
             clearSearch()
+        }
+
+        searchHistoryClearButton.setOnClickListener {
+            searchHistory.clearHistory()
+            hideHistory()
         }
     }
 
@@ -128,6 +174,8 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.isVisible = false
 
         placeholderContainer.isVisible = false
+
+        updateHistoryVisibility()
     }
 
     private fun performSearch(query: String) {
@@ -167,12 +215,14 @@ class SearchActivity : AppCompatActivity() {
     private fun showLoading() {
         recyclerView.isVisible = false
         placeholderContainer.isVisible = false
+        searchHistoryContainer.isVisible = false
         progressBar.isVisible = true
     }
 
     private fun showTracks(tracks: List<Track>) {
         progressBar.isVisible = false
         placeholderContainer.isVisible = false
+        searchHistoryContainer.isVisible = false
         recyclerView.isVisible = true
 
         trackAdapter.updateData(tracks)
@@ -181,6 +231,7 @@ class SearchActivity : AppCompatActivity() {
     private fun showNoResultsPlaceholder() {
         progressBar.isVisible = false
         recyclerView.isVisible = false
+        searchHistoryContainer.isVisible = false
         placeholderContainer.isVisible = true
 
         placeholderImage.setImageResource(R.drawable.ic_placeholder_no_results)
@@ -191,6 +242,7 @@ class SearchActivity : AppCompatActivity() {
     private fun showErrorPlaceholder() {
         progressBar.isVisible = false
         recyclerView.isVisible = false
+        searchHistoryContainer.isVisible = false
         placeholderContainer.isVisible = true
 
         placeholderImage.setImageResource(R.drawable.ic_placeholder_error_track)
@@ -206,7 +258,36 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
+    private fun updateHistoryVisibility() {
+        val hasFocus = searchEditText.hasFocus()
+        val isEmptyText = searchEditText.text.isNullOrEmpty()
+        val hasHistory = searchHistory.hasHistory()
+        if (hasFocus && isEmptyText && hasHistory) {
+            showHistory()
+        } else {
+            hideHistory()
+        }
+    }
+
+    private fun showHistory() {
+        val history = searchHistory.getHistory()
+        if (history.isNotEmpty()) {
+            searchHistoryContainer.isVisible = true
+            recyclerView.isVisible = false
+            placeholderContainer.isVisible = false
+            progressBar.isVisible = false
+
+            historyAdapter.updateData(history)
+        } else {
+            hideHistory()
+        }
+    }
+
+    private fun hideHistory() {
+        searchHistoryContainer.isVisible = false
+    }
+
+        override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(KEY_SEARCH_TEXT, searchText)
         outState.putString(KEY_LAST_SEARCH_QUERY, lastSearchQuery)
@@ -226,6 +307,9 @@ class SearchActivity : AppCompatActivity() {
         searchEditText.setText(restoredText)
         searchEditText.setSelection(restoredText.length)
         searchClearButton.isVisible = restoredText.isNotEmpty()
+
+        updateHistoryVisibility()
+
         if (restoredLastQuery.isEmpty()) return
     }
 }

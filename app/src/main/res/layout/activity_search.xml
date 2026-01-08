@@ -40,6 +40,34 @@
             tools:ignore="ContentDescription"/>
     </FrameLayout>
 
+    <LinearLayout
+        android:id="@+id/searchHistoryContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:paddingTop="24dp">
+
+        <TextView
+            android:id="@+id/searchHistoryTitle"
+            style="@style/SearchHistoryTitleStyle"
+            android:text="@string/you_searched"/>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/searchHistoryRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/searchHistoryClearButton"
+            style="@style/SearchHistoryClearButtonStyle"
+            android:text="@string/clear_history"/>
+
+    </LinearLayout>
+
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"

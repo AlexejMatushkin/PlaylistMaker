@@ -18,7 +18,20 @@ class TrackAdapter(
         private const val CORNER_RADIUS_PX = 2f
     }
 
-    class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    interface OnItemClickListener {
+        fun onItemClick(track: Track)
+    }
+
+    private var onItemClickListener: OnItemClickListener? = null
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        this.onItemClickListener = listener
+    }
+
+    class TrackViewHolder(
+        itemView: View,
+        private val onItemClickListener: OnItemClickListener?
+    ) : RecyclerView.ViewHolder(itemView) {
         private val tvTrackName: TextView = itemView.findViewById(R.id.tvTrackName)
         private val tvArtistName: TextView = itemView.findViewById(R.id.tvArtistName)
         private val tvTrackTime: TextView = itemView.findViewById(R.id.tvTrackTime)
@@ -45,6 +58,10 @@ class TrackAdapter(
             } else {
                 ivArtwork.setImageResource(R.drawable.ic_music_note)
             }
+
+            itemView.setOnClickListener {
+                onItemClickListener?.onItemClick(track)
+            }
         }
 
     }
@@ -52,7 +69,7 @@ class TrackAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_track, parent, false)
-        return TrackViewHolder(view)
+        return TrackViewHolder(view, onItemClickListener)
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {

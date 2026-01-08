@@ -8,6 +8,7 @@ import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.android.material.textview.MaterialTextView
 
 class SettingsActivity : AppCompatActivity() {
@@ -70,6 +71,14 @@ class SettingsActivity : AppCompatActivity() {
             val agreementUri = getString(R.string.user_agreement_url).toUri()
             val browserIntent = Intent(Intent.ACTION_VIEW, agreementUri)
             startActivity(browserIntent)
+        }
+
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.theme_switch)
+
+        themeSwitcher.isChecked = (application as App).darkTheme
+
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (application as App).switchTheme(checked)
         }
     }
 }
