@@ -271,16 +271,14 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showHistory() {
         val history = searchHistory.getHistory()
-        if (history.isNotEmpty()) {
-            searchHistoryContainer.isVisible = true
-            recyclerView.isVisible = false
-            placeholderContainer.isVisible = false
-            progressBar.isVisible = false
 
-            historyAdapter.updateData(history)
-        } else {
-            hideHistory()
-        }
+        searchHistoryContainer.isVisible = true
+        recyclerView.isVisible = false
+        placeholderContainer.isVisible = false
+        progressBar.isVisible = false
+
+        historyAdapter.updateData(history)
+
     }
 
     private fun hideHistory() {

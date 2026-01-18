@@ -20,9 +20,13 @@
             app:navigationIcon="@drawable/ic_arrow_back_24"/>
 
     <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         style="@style/SearchContainerStyle">
         <EditText
             android:id="@+id/search_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             style="@style/SearchEditTextStyle"
             android:imeOptions="actionDone"
             android:singleLine="true"
@@ -34,6 +38,9 @@
 
         <ImageButton
             android:id="@+id/search_clear_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end|center_vertical"
             style="@style/SearchClearButtonStyle"
             android:src="@drawable/ic_clear_24"
             android:visibility="gone"
@@ -50,6 +57,9 @@
 
         <TextView
             android:id="@+id/searchHistoryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             style="@style/SearchHistoryTitleStyle"
             android:text="@string/you_searched"/>
 
@@ -63,6 +73,9 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/searchHistoryClearButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             style="@style/SearchHistoryClearButtonStyle"
             android:text="@string/clear_history"/>
 
@@ -94,6 +107,8 @@
 
         <ImageView
             android:id="@+id/placeholderImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             style="@style/PlaceholderImageStyle"
             android:importantForAccessibility="no" />
 
@@ -103,6 +118,8 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/retryButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             style="@style/RetryButtonStyle"
             android:text="@string/retry"
             android:visibility="gone"/>
