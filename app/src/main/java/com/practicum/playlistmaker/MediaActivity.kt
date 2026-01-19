@@ -5,6 +5,8 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -13,11 +15,21 @@ import java.util.Locale
 
 class MediaActivity : AppCompatActivity() {
 
+    companion object {
+        private const val EXTRA_TRACK = "extra_track"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media)
 
-        if (intent.getStringExtra("track_name").isNullOrBlank()) {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        val track = intent.getParcelableExtra<Track>(EXTRA_TRACK) ?: run {
             finish()
             return
         }
@@ -34,26 +46,15 @@ class MediaActivity : AppCompatActivity() {
         val country = findViewById<TextView>(R.id.country)
         val trackTime = findViewById<TextView>(R.id.trackTime)
 
-        val trackNameStr = intent.getStringExtra("track_name") ?: ""
-        val artistNameStr = intent.getStringExtra("artist_name") ?: ""
-        val collectionName = intent.getStringExtra("collection_name")
-        val releaseDateStr = intent.getStringExtra("release_date")
-        val primaryGenreName = intent.getStringExtra("genre") ?: ""
-        val countryStr = intent.getStringExtra("country") ?: ""
-        val artworkUrl100 = intent.getStringExtra("artwork_url")
-        val trackTimeMillis = intent.getLongExtra("track_time", -1L).takeIf { it != -1L }
+        trackName.text = track.trackName
+        artistName.text = track.artistName
+        genre.text = track.primaryGenreName ?: ""
+        country.text = track.country ?: ""
+        trackTime.text = track.getFormattedTime()
 
-        trackName.text = trackNameStr
-        artistName.text = artistNameStr
-        genre.text = primaryGenreName
-        country.text = countryStr
 
-        trackTime.text = trackTimeMillis?.let {
-            SimpleDateFormat("mm:ss", Locale.getDefault()).format(it)
-        } ?: ""
-
-        if (!collectionName.isNullOrEmpty()) {
-            albumName.text = collectionName
+        if (!track.collectionName.isNullOrEmpty()) {
+            albumName.text = track.collectionName
             albumLabel.isVisible = true
             albumName.isVisible = true
         } else {
@@ -61,9 +62,9 @@ class MediaActivity : AppCompatActivity() {
             albumName.isVisible = false
         }
 
-        val releaseYearStr = releaseDateStr?.takeIf { it.length >= 4 }?.substring(0, 4)
-        if (releaseYearStr != null) {
-            releaseYear.text = releaseYearStr
+        val year = track.releaseDate?.takeIf { it.length >= 4 }?.substring(0, 4)
+        if (year != null) {
+            releaseYear.text = year
             yearLabel.isVisible = true
             releaseYear.isVisible = true
         } else {
@@ -72,8 +73,8 @@ class MediaActivity : AppCompatActivity() {
         }
 
         val placeholder = R.drawable.ic_music_note
-        if (!artworkUrl100.isNullOrEmpty()) {
-            val highResUrl = artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")
+        val highResUrl = track.getCoverArtwork()
+        if (highResUrl != null) {
             Glide.with(this)
                 .load(highResUrl)
                 .placeholder(placeholder)

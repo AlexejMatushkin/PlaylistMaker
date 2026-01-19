@@ -26,6 +26,7 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         private const val KEY_SEARCH_TEXT = "SEARCH_TEXT"
         private const val KEY_LAST_SEARCH_QUERY = "LAST_SEARCH_QUERY"
+        private const val EXTRA_TRACK = "extra_track"
     }
 
     private lateinit var searchEditText: EditText
@@ -116,15 +117,7 @@ class SearchActivity : AppCompatActivity() {
         updateHistoryVisibility()
 
         val intent = Intent(this, MediaActivity::class.java).apply {
-            putExtra("track_id", track.trackId)
-            putExtra("track_name", track.trackName)
-            putExtra("artist_name", track.artistName)
-            putExtra("collection_name", track.collectionName)
-            putExtra("release_date", track.releaseDate)
-            putExtra("genre", track.primaryGenreName)
-            putExtra("country", track.country)
-            putExtra("artwork_url", track.artworkUrl100)
-            putExtra("track_time", track.trackTimeMillis ?: -1L)
+            putExtra(EXTRA_TRACK, track)
         }
         startActivity(intent)
     }

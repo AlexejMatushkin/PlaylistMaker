@@ -8,16 +8,16 @@
     android:orientation="vertical"
     tools:context=".SearchActivity">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar_search"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_marginTop="@dimen/margin_small"
-            android:layout_marginBottom="@dimen/margin_small"
-            app:title="@string/search_title"
-            app:titleTextAppearance="@style/SearchTitleTextAppearance"
-            app:navigationIconTint="?attr/colorOnSurface"
-            app:navigationIcon="@drawable/ic_arrow_back_24"/>
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar_search"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_small"
+        app:navigationIcon="@drawable/ic_arrow_back_24"
+        app:navigationIconTint="?attr/colorOnSurface"
+        app:title="@string/search_title"
+        app:titleTextAppearance="@style/SearchTitleTextAppearance" />
 
     <FrameLayout
         android:layout_width="match_parent"
