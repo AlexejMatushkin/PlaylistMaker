@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -113,6 +114,19 @@ class SearchActivity : AppCompatActivity() {
     private fun handleTrackClick(track: Track) {
         searchHistory.addTrack(track)
         updateHistoryVisibility()
+
+        val intent = Intent(this, MediaActivity::class.java).apply {
+            putExtra("track_id", track.trackId)
+            putExtra("track_name", track.trackName)
+            putExtra("artist_name", track.artistName)
+            putExtra("collection_name", track.collectionName)
+            putExtra("release_date", track.releaseDate)
+            putExtra("genre", track.primaryGenreName)
+            putExtra("country", track.country)
+            putExtra("artwork_url", track.artworkUrl100)
+            putExtra("track_time", track.trackTimeMillis ?: -1L)
+        }
+        startActivity(intent)
     }
 
     private fun setupSearchField() {

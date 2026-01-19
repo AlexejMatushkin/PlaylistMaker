@@ -59,7 +59,7 @@
             android:id="@+id/searchHistoryTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="center"
             style="@style/SearchHistoryTitleStyle"
             android:text="@string/you_searched"/>
 
@@ -75,7 +75,7 @@
             android:id="@+id/searchHistoryClearButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="center"
             style="@style/SearchHistoryClearButtonStyle"
             android:text="@string/clear_history"/>
 
