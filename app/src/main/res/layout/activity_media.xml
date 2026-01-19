@@ -94,8 +94,8 @@
 
             <ImageButton
                 android:id="@+id/addToPlaylistButton"
-                android:layout_width="51dp"
-                android:layout_height="51dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="@drawable/round_button_gray"
                 android:src="@drawable/ic_add_to_playlist"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -106,8 +106,8 @@
 
             <ImageButton
                 android:id="@+id/playButton"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_play_circle"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -119,8 +119,8 @@
 
             <ImageButton
                 android:id="@+id/favoriteButton"
-                android:layout_width="51dp"
-                android:layout_height="51dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:src="@drawable/ic_favorite_border"
                 android:background="@drawable/round_button_gray"
                 app:layout_constraintBottom_toBottomOf="parent"
