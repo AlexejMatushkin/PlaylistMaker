@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker
 
+import android.os.Build
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -10,8 +11,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class MediaActivity : AppCompatActivity() {
 
@@ -29,32 +28,58 @@ class MediaActivity : AppCompatActivity() {
             insets
         }
 
-        val track = intent.getParcelableExtra<Track>(EXTRA_TRACK) ?: run {
+        val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra(EXTRA_TRACK, Track::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getParcelableExtra<Track>(EXTRA_TRACK)
+        } ?: run {
             finish()
             return
         }
 
-        val backButton = findViewById<ImageButton>(R.id.backButton)
-        val albumCover = findViewById<ImageView>(R.id.albumCover)
-        val trackName = findViewById<TextView>(R.id.trackName)
-        val artistName = findViewById<TextView>(R.id.artistName)
-        val albumLabel = findViewById<TextView>(R.id.albumLabel)
-        val albumName = findViewById<TextView>(R.id.albumName)
-        val yearLabel = findViewById<TextView>(R.id.yearLabel)
-        val releaseYear = findViewById<TextView>(R.id.releaseYear)
+        val backButton = findViewById<ImageButton>(R.id.back_button)
+        val albumCover = findViewById<ImageView>(R.id.album_cover)
+        val trackName = findViewById<TextView>(R.id.track_name)
+        val artistName = findViewById<TextView>(R.id.artist_name)
+        val trackProgress = findViewById<TextView>(R.id.track_progress)
+        val albumLabel = findViewById<TextView>(R.id.album_label)
+        val albumName = findViewById<TextView>(R.id.album_name)
+        val yearLabel = findViewById<TextView>(R.id.year_label)
+        val releaseYear = findViewById<TextView>(R.id.release_year)
         val genre = findViewById<TextView>(R.id.genre)
         val country = findViewById<TextView>(R.id.country)
-        val trackTime = findViewById<TextView>(R.id.trackTime)
+        val trackTime = findViewById<TextView>(R.id.track_time)
 
         trackName.text = track.trackName
         artistName.text = track.artistName
         genre.text = track.primaryGenreName ?: ""
         country.text = track.country ?: ""
         trackTime.text = track.getFormattedTime()
+        trackProgress.text = "00:00"
 
+        val placeholder = R.drawable.ic_music_note
+        val highResUrl = track.getCoverArtwork()
+        if (highResUrl != null) {
+            Glide.with(this)
+                .load(highResUrl)
+                .placeholder(placeholder)
+                .error(placeholder)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .centerCrop()
+                .into(albumCover)
+        } else {
+            albumCover.setImageResource(placeholder)
+        }
 
-        if (!track.collectionName.isNullOrEmpty()) {
-            albumName.text = track.collectionName
+        if (!track.collectionName.isNullOrBlank()) {
+            val albumText = if (track.collectionName.length > 30) {
+                track.collectionName.substring(0, 27) + "..."
+            } else {
+                track.collectionName
+            }
+            albumName.text = albumText
+
             albumLabel.isVisible = true
             albumName.isVisible = true
         } else {
@@ -70,20 +95,6 @@ class MediaActivity : AppCompatActivity() {
         } else {
             yearLabel.isVisible = false
             releaseYear.isVisible = false
-        }
-
-        val placeholder = R.drawable.ic_music_note
-        val highResUrl = track.getCoverArtwork()
-        if (highResUrl != null) {
-            Glide.with(this)
-                .load(highResUrl)
-                .placeholder(placeholder)
-                .error(placeholder)
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .centerCrop()
-                .into(albumCover)
-        } else {
-            albumCover.setImageResource(placeholder)
         }
 
         backButton.setOnClickListener {
