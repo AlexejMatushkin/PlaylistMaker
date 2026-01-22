@@ -10,6 +10,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 
 class MediaActivity : AppCompatActivity() {
@@ -28,12 +29,7 @@ class MediaActivity : AppCompatActivity() {
             insets
         }
 
-        val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(EXTRA_TRACK, Track::class.java)
-        } else {
-            @Suppress("DEPRECATION")
-            intent.getParcelableExtra<Track>(EXTRA_TRACK)
-        } ?: run {
+        val track = intent.getParcelableExtra<Track>(EXTRA_TRACK) ?: run {
             finish()
             return
         }
@@ -58,6 +54,11 @@ class MediaActivity : AppCompatActivity() {
         trackTime.text = track.getFormattedTime()
         trackProgress.text = "00:00"
 
+        val cornerRadius = DimensionUtils.pxToDp(
+            8f,
+            this
+        )
+
         val placeholder = R.drawable.ic_music_note
         val highResUrl = track.getCoverArtwork()
         if (highResUrl != null) {
@@ -65,21 +66,15 @@ class MediaActivity : AppCompatActivity() {
                 .load(highResUrl)
                 .placeholder(placeholder)
                 .error(placeholder)
-                .transition(DrawableTransitionOptions.withCrossFade())
                 .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(albumCover)
         } else {
             albumCover.setImageResource(placeholder)
         }
 
-        if (!track.collectionName.isNullOrBlank()) {
-            val albumText = if (track.collectionName.length > 30) {
-                track.collectionName.substring(0, 27) + "..."
-            } else {
-                track.collectionName
-            }
-            albumName.text = albumText
-
+        if (!track.collectionName.isNullOrEmpty()) {
+            albumName.text = track.collectionName
             albumLabel.isVisible = true
             albumName.isVisible = true
         } else {
