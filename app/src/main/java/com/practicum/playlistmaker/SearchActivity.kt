@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -25,6 +26,7 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         private const val KEY_SEARCH_TEXT = "SEARCH_TEXT"
         private const val KEY_LAST_SEARCH_QUERY = "LAST_SEARCH_QUERY"
+        private const val EXTRA_TRACK = "extra_track"
     }
 
     private lateinit var searchEditText: EditText
@@ -113,6 +115,11 @@ class SearchActivity : AppCompatActivity() {
     private fun handleTrackClick(track: Track) {
         searchHistory.addTrack(track)
         updateHistoryVisibility()
+
+        val intent = Intent(this, MediaActivity::class.java).apply {
+            putExtra(EXTRA_TRACK, track)
+        }
+        startActivity(intent)
     }
 
     private fun setupSearchField() {
