@@ -81,13 +81,16 @@
 
     </LinearLayout>
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:indeterminate="true"
+        android:orientation="vertical"
         android:layout_gravity="center"
-        android:visibility="gone"
-        style="?android:attr/progressBarStyle"/>
+        app:indicatorColor="@color/blue"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="140dp" />
     
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTracks"
@@ -123,6 +126,7 @@
             style="@style/RetryButtonStyle"
             android:text="@string/retry"
             android:visibility="gone"/>
+
 
     </LinearLayout>
 

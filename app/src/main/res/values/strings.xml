@@ -49,4 +49,6 @@
     <string name="genre">Жанр</string>
     <string name="country">Страна</string>
 
+    <string name="track_time_default">00:00</string>
+
 </resources>
