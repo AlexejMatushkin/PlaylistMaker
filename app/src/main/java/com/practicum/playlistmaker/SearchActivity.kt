@@ -60,7 +60,6 @@ class SearchActivity : AppCompatActivity() {
     private var searchRunnable: Runnable? = null
 
     private var isClickAllowed = true
-    private val clickHandler = Handler(Looper.getMainLooper())
     private val clickRunnable = Runnable { isClickAllowed = true }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -129,7 +128,7 @@ class SearchActivity : AppCompatActivity() {
 
             handleTrackClick(track)
 
-            clickHandler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
+            handler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
         }
     }
 
@@ -358,6 +357,5 @@ class SearchActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
-        clickHandler.removeCallbacksAndMessages(null)
     }
 }

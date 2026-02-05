@@ -17,15 +17,6 @@ import java.util.Locale
 
 class MediaActivity : AppCompatActivity() {
 
-    companion object {
-        private const val EXTRA_TRACK = "extra_track"
-        private const val PROGRESS_UPDATE_INTERVAL_MS = 100L
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-    }
-
     private lateinit var playButton: ImageButton
     private lateinit var trackProgress: TextView
     private lateinit var track: Track
@@ -91,7 +82,7 @@ class MediaActivity : AppCompatActivity() {
         genre.text = track.primaryGenreName ?: ""
         country.text = track.country ?: ""
         trackTime.text = track.getFormattedTime()
-        trackProgress.text = getString(R.string.track_time_default)
+        trackProgress.text = formatMillisToMinutesSeconds(0L)
 
         val placeholder = R.drawable.ic_music_note
         val highResUrl = track.getCoverArtwork()
@@ -163,7 +154,7 @@ class MediaActivity : AppCompatActivity() {
                 playerState = STATE_PREPARED
                 updatePlayButtonState()
                 handler.removeCallbacks(updateProgressRunnable)
-                trackProgress.text = getString(R.string.track_time_default)
+                trackProgress.text = formatMillisToMinutesSeconds(0L)
             }
 
             setOnErrorListener { _, _, _ ->
@@ -273,5 +264,14 @@ class MediaActivity : AppCompatActivity() {
         super.onDestroy()
         releaseMediaPlayer()
         handler.removeCallbacksAndMessages(null)
+    }
+
+    companion object {
+        private const val EXTRA_TRACK = "extra_track"
+        private const val PROGRESS_UPDATE_INTERVAL_MS = 300L
+        private const val STATE_DEFAULT = 0
+        private const val STATE_PREPARED = 1
+        private const val STATE_PLAYING = 2
+        private const val STATE_PAUSED = 3
     }
 }
