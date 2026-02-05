@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import java.util.Locale
 
 class MediaActivity : AppCompatActivity() {
 
@@ -53,7 +54,7 @@ class MediaActivity : AppCompatActivity() {
             insets
         }
 
-       track = intent.getParcelableExtra<Track>(EXTRA_TRACK) ?: run {
+        track = intent.getParcelableExtra<Track>(EXTRA_TRACK) ?: run {
             finish()
             return
         }
@@ -90,7 +91,7 @@ class MediaActivity : AppCompatActivity() {
         genre.text = track.primaryGenreName ?: ""
         country.text = track.country ?: ""
         trackTime.text = track.getFormattedTime()
-        trackProgress.text = "00:00"
+        trackProgress.text = getString(R.string.track_time_default)
 
         val placeholder = R.drawable.ic_music_note
         val highResUrl = track.getCoverArtwork()
@@ -162,10 +163,10 @@ class MediaActivity : AppCompatActivity() {
                 playerState = STATE_PREPARED
                 updatePlayButtonState()
                 handler.removeCallbacks(updateProgressRunnable)
-                trackProgress.text = "00:00"
+                trackProgress.text = getString(R.string.track_time_default)
             }
 
-            setOnErrorListener { _, what, extra ->
+            setOnErrorListener { _, _, _ ->
                 playerState = STATE_DEFAULT
                 playButton.isEnabled = false
                 updatePlayButtonState()
@@ -245,7 +246,7 @@ class MediaActivity : AppCompatActivity() {
         val totalSeconds = millis / 1000
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
-        return String.format("%02d:%02d", minutes, seconds)
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
     }
 
     private fun releaseMediaPlayer() {
