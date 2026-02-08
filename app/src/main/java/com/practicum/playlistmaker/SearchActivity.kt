@@ -2,12 +2,13 @@ package com.practicum.playlistmaker
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import java.util.concurrent.atomic.AtomicBoolean
 
 class SearchActivity : AppCompatActivity() {
@@ -27,12 +29,14 @@ class SearchActivity : AppCompatActivity() {
         private const val KEY_SEARCH_TEXT = "SEARCH_TEXT"
         private const val KEY_LAST_SEARCH_QUERY = "LAST_SEARCH_QUERY"
         private const val EXTRA_TRACK = "extra_track"
+        private const val DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
     private lateinit var searchEditText: EditText
     private lateinit var searchClearButton: ImageButton
     private lateinit var recyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
+    private lateinit var progressBar: CircularProgressIndicator
     private lateinit var placeholderContainer: View
     private lateinit var placeholderImage: ImageView
     private lateinit var placeholderText: TextView
@@ -51,6 +55,12 @@ class SearchActivity : AppCompatActivity() {
     private var searchText: String = ""
     private var isSearchInProgress = AtomicBoolean(false)
     private var lastSearchQuery = ""
+
+    private val handler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
+
+    private var isClickAllowed = true
+    private val clickRunnable = Runnable { isClickAllowed = true }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,7 +108,7 @@ class SearchActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         val itemClickListener = object : TrackAdapter.OnItemClickListener {
             override fun onItemClick(track: Track) {
-                handleTrackClick(track)
+                handleTrackClickWithDebounce(track)
             }
         }
 
@@ -110,6 +120,16 @@ class SearchActivity : AppCompatActivity() {
         historyAdapter.setOnItemClickListener(itemClickListener)
         searchHistoryRecyclerView.adapter = historyAdapter
         searchHistoryRecyclerView.layoutManager = LinearLayoutManager(this)
+    }
+
+    private fun handleTrackClickWithDebounce(track: Track) {
+        if (isClickAllowed) {
+            isClickAllowed = false
+
+            handleTrackClick(track)
+
+            handler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
+        }
     }
 
     private fun handleTrackClick(track: Track) {
@@ -128,6 +148,7 @@ class SearchActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val query = searchEditText.text.toString().trim()
                 if (query.isNotEmpty()) {
+                    searchRunnable?.let { handler.removeCallbacks(it) }
                     performSearch(query)
                 }
                 true
@@ -141,6 +162,17 @@ class SearchActivity : AppCompatActivity() {
             searchClearButton.isVisible = searchText.isNotEmpty()
 
             updateHistoryVisibility()
+
+            searchRunnable?.let { handler.removeCallbacks(it) }
+
+            if (searchText.isNotEmpty()) {
+                searchRunnable = Runnable {
+                    performSearch(searchText)
+                }
+                handler.postDelayed(searchRunnable!!, DEBOUNCE_DELAY)
+            } else {
+                showEmptyScreen()
+            }
         }
 
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
@@ -168,6 +200,7 @@ class SearchActivity : AppCompatActivity() {
         recyclerView.isVisible = false
         placeholderContainer.isVisible = false
         progressBar.isVisible = false
+        searchHistoryContainer.isVisible = false
     }
 
     private fun clearSearch() {
@@ -179,10 +212,13 @@ class SearchActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
 
         recyclerView.isVisible = false
-
         placeholderContainer.isVisible = false
+        progressBar.isVisible = false
+        searchHistoryContainer.isVisible = false
 
         updateHistoryVisibility()
+
+        searchRunnable?.let { handler.removeCallbacks(it) }
     }
 
     private fun performSearch(query: String) {
@@ -316,5 +352,10 @@ class SearchActivity : AppCompatActivity() {
         updateHistoryVisibility()
 
         if (restoredLastQuery.isEmpty()) return
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(null)
     }
 }
