@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation.ui.media
 
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -13,19 +13,26 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.models.Track
 import java.util.Locale
 
 class MediaActivity : AppCompatActivity() {
 
+    // UI элементы
     private lateinit var playButton: ImageButton
     private lateinit var trackProgress: TextView
-    private lateinit var track: Track
     private lateinit var backButton: ImageButton
 
+    // Данные
+    private lateinit var track: Track
+
+    // MediaPlayer
     private var mediaPlayer: MediaPlayer? = null
     private var playerState = STATE_DEFAULT
     private var playbackPosition = 0
 
+    // Handler для обновления прогресса
     private val handler = Handler(Looper.getMainLooper())
     private val updateProgressRunnable = object : Runnable {
         override fun run() {
@@ -45,6 +52,7 @@ class MediaActivity : AppCompatActivity() {
             insets
         }
 
+        // Получаем трек из Intent
         track = intent.getParcelableExtra<Track>(EXTRA_TRACK) ?: run {
             finish()
             return
@@ -77,6 +85,7 @@ class MediaActivity : AppCompatActivity() {
         val country = findViewById<TextView>(R.id.country)
         val trackTime = findViewById<TextView>(R.id.track_time)
 
+        // Заполняем данные
         trackName.text = track.trackName
         artistName.text = track.artistName
         genre.text = track.primaryGenreName ?: ""
@@ -84,6 +93,7 @@ class MediaActivity : AppCompatActivity() {
         trackTime.text = track.getFormattedTime()
         trackProgress.text = formatMillisToMinutesSeconds(0L)
 
+        // Загрузка обложки
         val placeholder = R.drawable.ic_music_note
         val highResUrl = track.getCoverArtwork()
         if (highResUrl != null) {
@@ -98,6 +108,7 @@ class MediaActivity : AppCompatActivity() {
             albumCover.setImageResource(placeholder)
         }
 
+        // Альбом (показываем только если есть)
         if (!track.collectionName.isNullOrEmpty()) {
             albumName.text = track.collectionName
             albumLabel.isVisible = true
@@ -107,6 +118,7 @@ class MediaActivity : AppCompatActivity() {
             albumName.isVisible = false
         }
 
+        // Год (показываем только если есть)
         val year = track.releaseDate?.takeIf { it.length >= 4 }?.substring(0, 4)
         if (year != null) {
             releaseYear.text = year
@@ -267,7 +279,7 @@ class MediaActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val EXTRA_TRACK = "extra_track"
+        const val EXTRA_TRACK = "extra_track"
         private const val PROGRESS_UPDATE_INTERVAL_MS = 300L
         private const val STATE_DEFAULT = 0
         private const val STATE_PREPARED = 1

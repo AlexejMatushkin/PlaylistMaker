@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.presentation.ui.search
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -21,6 +22,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.presentation.ui.media.MediaActivity
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.api.SearchHistoryInteractor
+import com.practicum.playlistmaker.domain.api.TracksInteractor
+import com.practicum.playlistmaker.domain.models.Track
 import java.util.concurrent.atomic.AtomicBoolean
 
 class SearchActivity : AppCompatActivity() {
@@ -28,11 +35,15 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         private const val KEY_SEARCH_TEXT = "SEARCH_TEXT"
         private const val KEY_LAST_SEARCH_QUERY = "LAST_SEARCH_QUERY"
-        private const val EXTRA_TRACK = "extra_track"
         private const val DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
+    // Интеракторы
+    private lateinit var tracksInteractor: TracksInteractor
+    private lateinit var searchHistoryInteractor: SearchHistoryInteractor
+
+    // UI элементы
     private lateinit var searchEditText: EditText
     private lateinit var searchClearButton: ImageButton
     private lateinit var recyclerView: RecyclerView
@@ -49,8 +60,6 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
-    private val repository = SearchRepository(iTunesApiService.create())
-    private lateinit var searchHistory: SearchHistory
 
     private var searchText: String = ""
     private var isSearchInProgress = AtomicBoolean(false)
@@ -72,9 +81,8 @@ class SearchActivity : AppCompatActivity() {
             insets
         }
 
-        searchHistory = SearchHistory(
-            getSharedPreferences("playlist_maker", MODE_PRIVATE)
-        )
+        tracksInteractor = Creator.provideTracksInteractor()
+        searchHistoryInteractor = Creator.provideSearchHistoryInteractor()
 
         initViews()
         setupButtons()
@@ -133,11 +141,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun handleTrackClick(track: Track) {
-        searchHistory.addTrack(track)
+        searchHistoryInteractor.addTrack(track)
         updateHistoryVisibility()
 
         val intent = Intent(this, MediaActivity::class.java).apply {
-            putExtra(EXTRA_TRACK, track)
+            putExtra(MediaActivity.EXTRA_TRACK, track)
         }
         startActivity(intent)
     }
@@ -175,7 +183,7 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+        searchEditText.setOnFocusChangeListener { _, _ ->
             updateHistoryVisibility()
         }
 
@@ -184,7 +192,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         searchHistoryClearButton.setOnClickListener {
-            searchHistory.clearHistory()
+            searchHistoryInteractor.clearHistory()
             hideHistory()
         }
     }
@@ -208,7 +216,7 @@ class SearchActivity : AppCompatActivity() {
         searchClearButton.isVisible = false
 
         val imm =
-            getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
 
         recyclerView.isVisible = false
@@ -232,24 +240,16 @@ class SearchActivity : AppCompatActivity() {
 
         showLoading()
 
-        repository.searchTracks(query, object : SearchRepository.SearchCallback {
-            override fun onSuccess(tracks: List<Track>) {
+        tracksInteractor.searchTracks(query, object : TracksInteractor.TracksConsumer {
+            override fun consume(foundTracks: List<Track>) {
                 runOnUiThread {
                     isSearchInProgress.set(false)
-                    if (tracks.isEmpty()) {
+                    if (foundTracks.isEmpty()) {
 
                         showNoResultsPlaceholder()
                     } else {
-                        showTracks(tracks)
+                        showTracks(foundTracks)
                     }
-                }
-            }
-
-            override fun onError(error: String) {
-                runOnUiThread {
-                    isSearchInProgress.set(false)
-
-                    showErrorPlaceholder()
                 }
             }
         })
@@ -304,7 +304,7 @@ class SearchActivity : AppCompatActivity() {
     private fun updateHistoryVisibility() {
         val hasFocus = searchEditText.hasFocus()
         val isEmptyText = searchEditText.text.isNullOrEmpty()
-        val hasHistory = searchHistory.hasHistory()
+        val hasHistory = searchHistoryInteractor.hasHistory()
         if (hasFocus && isEmptyText && hasHistory) {
             showHistory()
         } else {
@@ -313,7 +313,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showHistory() {
-        val history = searchHistory.getHistory()
+        val history = searchHistoryInteractor.getHistory()
 
         searchHistoryContainer.isVisible = true
         recyclerView.isVisible = false
