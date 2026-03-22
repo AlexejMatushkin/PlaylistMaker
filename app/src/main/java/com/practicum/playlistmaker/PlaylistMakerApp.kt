@@ -1,39 +1,31 @@
 package com.practicum.playlistmaker
 
 import android.app.Application
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
+import com.practicum.playlistmaker.domain.api.SettingsInteractor
 
-class App : Application() {
+class PlaylistMakerApp : Application() {
+
+    private lateinit var settingsInteractor: SettingsInteractor
 
     var darkTheme = false
-    private lateinit var sharedPrefs: SharedPreferences
-
-    companion object {
-        private const val PREFS_NAME = "app_settings"
-        private const val DARK_THEME_KEY = "dark_theme"
-    }
+        private set
 
     override fun onCreate() {
         super.onCreate()
+        Creator.init(this)
 
-        sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        settingsInteractor = Creator.provideSettingsInteractor()
 
-        darkTheme = sharedPrefs.getBoolean(DARK_THEME_KEY, false)
-
+        val themeSettings = settingsInteractor.getThemeSettings()
+        darkTheme = themeSettings.isDarkTheme
         applyTheme(darkTheme)
-
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {
         darkTheme = darkThemeEnabled
-
-        sharedPrefs.edit()
-            .putBoolean(DARK_THEME_KEY, darkThemeEnabled)
-            .apply()
-
         applyTheme(darkThemeEnabled)
+        settingsInteractor.switchTheme(darkThemeEnabled)
     }
 
     private fun applyTheme(darkThemeEnabled: Boolean) {

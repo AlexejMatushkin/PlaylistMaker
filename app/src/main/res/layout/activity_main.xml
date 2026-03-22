@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="?attr/colorPrimary"
-    tools:context=".MainActivity">
+    tools:context=".presentation.ui.main.MainActivity">
 
     <TextView
         android:layout_width="wrap_content"
