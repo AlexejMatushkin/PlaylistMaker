@@ -2,22 +2,27 @@ package com.practicum.playlistmaker.presentation.ui.main
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.ActivityMainBinding
 import com.practicum.playlistmaker.presentation.ui.media.MediaActivity
 import com.practicum.playlistmaker.presentation.ui.search.SearchActivity
 import com.practicum.playlistmaker.presentation.ui.settings.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -28,32 +33,22 @@ class MainActivity : AppCompatActivity() {
         setupButtons()
     }
 
-    private fun setupButtons() {
-        setupSearchButton()
-        setupMediaButton()
-        setupSettingsButton()
-    }
+    private fun setupButtons() = binding.apply {
+        searchButton.setOnClickListener {
+            navigateTo<SearchActivity>()
+        }
 
-    private fun setupSearchButton() {
-        findViewById<Button>(R.id.search_button).setOnClickListener {
-            navigateTo(SearchActivity::class.java)
+        mediaButton.setOnClickListener {
+            navigateTo<MediaActivity>()
+        }
+
+        settingsButton.setOnClickListener {
+            navigateTo<SettingsActivity>()
         }
     }
 
-    private fun setupMediaButton() {
-        findViewById<Button>(R.id.media_button).setOnClickListener {
-            navigateTo(MediaActivity::class.java)
-        }
+    private inline fun <reified T> navigateTo() {
+        startActivity(Intent(this, T::class.java))
     }
 
-    private fun setupSettingsButton() {
-        findViewById<Button>(R.id.settings_button).setOnClickListener {
-            navigateTo(SettingsActivity::class.java)
-        }
-    }
-
-    private fun navigateTo(activityClass: Class<*>) {
-        val intent = Intent(this, activityClass)
-        startActivity(intent)
-    }
 }

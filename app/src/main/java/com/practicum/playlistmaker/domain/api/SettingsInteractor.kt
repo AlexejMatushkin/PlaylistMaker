@@ -4,6 +4,5 @@ import com.practicum.playlistmaker.domain.models.ThemeSettings
 
 interface SettingsInteractor {
     fun getThemeSettings(): ThemeSettings
-    fun updateThemeSettings(settings: ThemeSettings)
     fun switchTheme(isDark: Boolean)
 }
