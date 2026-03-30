@@ -1,6 +1,7 @@
-package com.practicum.playlistmaker.domain.theme
+package com.practicum.playlistmaker.domain.theme.interactor
 
 import com.practicum.playlistmaker.domain.settings.repository.SettingsRepository
+import com.practicum.playlistmaker.domain.theme.ThemeSettings
 
 class SwitchThemeInteractor(
     private val repository: SettingsRepository
