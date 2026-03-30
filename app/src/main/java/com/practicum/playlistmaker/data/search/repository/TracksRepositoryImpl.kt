@@ -35,11 +35,9 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
                 SearchResult.Success(tracks)
             }
             -1, -2 -> {
-                // Ошибка сети или другая ошибка
                 SearchResult.Error
             }
             else -> {
-                // Другие коды ответа (400, 404, 500 и т.д.)
                 SearchResult.Error
             }
         }

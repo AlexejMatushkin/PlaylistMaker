@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.sharing.interactor.SharingInteractor
-import com.practicum.playlistmaker.domain.theme.GetThemeSettingsInteractor
-import com.practicum.playlistmaker.domain.theme.ThemeManager
+import com.practicum.playlistmaker.domain.theme.interactor.GetThemeSettingsInteractor
+import com.practicum.playlistmaker.domain.theme.interactor.ThemeManager
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(

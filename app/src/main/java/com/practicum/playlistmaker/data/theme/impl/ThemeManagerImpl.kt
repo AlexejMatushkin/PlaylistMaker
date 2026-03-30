@@ -1,9 +1,9 @@
 package com.practicum.playlistmaker.data.theme.impl
 
 import androidx.appcompat.app.AppCompatDelegate
-import com.practicum.playlistmaker.domain.theme.GetThemeSettingsInteractor
-import com.practicum.playlistmaker.domain.theme.SwitchThemeInteractor
-import com.practicum.playlistmaker.domain.theme.ThemeManager
+import com.practicum.playlistmaker.domain.theme.interactor.GetThemeSettingsInteractor
+import com.practicum.playlistmaker.domain.theme.interactor.SwitchThemeInteractor
+import com.practicum.playlistmaker.domain.theme.interactor.ThemeManager
 
 class ThemeManagerImpl(
     private val getThemeSettingsInteractor: GetThemeSettingsInteractor,

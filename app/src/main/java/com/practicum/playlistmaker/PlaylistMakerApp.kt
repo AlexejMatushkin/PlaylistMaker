@@ -2,7 +2,7 @@ package com.practicum.playlistmaker
 
 import android.app.Application
 import com.practicum.playlistmaker.creator.Creator
-import com.practicum.playlistmaker.domain.theme.ThemeManager
+import com.practicum.playlistmaker.domain.theme.interactor.ThemeManager
 
 class PlaylistMakerApp : Application() {
 
@@ -16,7 +16,4 @@ class PlaylistMakerApp : Application() {
         themeManager.applyCurrentTheme()
     }
 
-    fun switchTheme(isDark: Boolean) {
-        themeManager.switchTheme(isDark)
-    }
 }

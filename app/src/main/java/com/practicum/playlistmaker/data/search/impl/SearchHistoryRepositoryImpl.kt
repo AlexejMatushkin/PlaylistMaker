@@ -14,7 +14,7 @@ class SearchHistoryRepositoryImpl(
         val json = sharedPreferences.getString(HISTORY_KEY, null) ?: return emptyList()
         return try {
             gson.fromJson(json, Array<Track>::class.java).toList()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }

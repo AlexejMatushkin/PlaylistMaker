@@ -22,9 +22,9 @@ class RetrofitNetworkClient : NetworkClient {
                 val response = iTunesService.search(dto.expression).execute()
                 val body = response.body()
                 body?.apply { resultCode = response.code() } ?: Response().apply { resultCode = response.code() }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 Response().apply { resultCode = -1 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Response().apply { resultCode = -2 }
             }
         } else {

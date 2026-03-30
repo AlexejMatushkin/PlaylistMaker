@@ -93,7 +93,7 @@ class SearchActivity : AppCompatActivity() {
             handler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
 
             val intent = Intent(this, MediaActivity::class.java).apply {
-                putExtra(MediaActivity.Companion.EXTRA_TRACK, track)
+                putExtra(MediaActivity.EXTRA_TRACK, track)
             }
             startActivity(intent)
         }
