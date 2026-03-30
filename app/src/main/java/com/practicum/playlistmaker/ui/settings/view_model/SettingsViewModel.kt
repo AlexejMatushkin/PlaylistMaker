@@ -34,15 +34,15 @@ class SettingsViewModel(
         }
     }
 
-    fun shareApp() {
-        sharingInteractor.shareApp()
+    fun shareApp(shareText: String, shareTitle: String) {
+        sharingInteractor.shareApp(shareText, shareTitle)
     }
 
-    fun sendSupport() {
-        sharingInteractor.openSupport()
+    fun sendSupport(email: String, subject: String, body: String) {
+        sharingInteractor.openSupport(email, subject, body)
     }
 
-    fun openAgreement() {
-        sharingInteractor.openTerms()
+    fun openAgreement(termsUrl: String) {
+        sharingInteractor.openTerms(termsUrl)
     }
 }

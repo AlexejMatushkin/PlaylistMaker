@@ -83,8 +83,7 @@ object Creator {
 
     fun provideSharingInteractor(): SharingInteractor {
         return SharingInteractorImpl(
-            externalNavigator = provideExternalNavigator(),
-            context = applicationContext
+            externalNavigator = provideExternalNavigator()
         )
     }
 }

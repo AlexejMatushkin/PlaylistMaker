@@ -56,19 +56,25 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupShareButton() {
         binding.shareButton.setOnClickListener {
-            viewModel.shareApp()
+            val shareText = getString(R.string.share_app_text)
+            val shareTitle = getString(R.string.share_app_name)
+            viewModel.shareApp(shareText, shareTitle)
         }
     }
 
     private fun setupSupportButton() {
         binding.supportButton.setOnClickListener {
-            viewModel.sendSupport()
+            val email = getString(R.string.support_email)
+            val subject = getString(R.string.support_subject)
+            val body = getString(R.string.support_body)
+            viewModel.sendSupport(email, subject, body)
         }
     }
 
     private fun setupAgreementButton() {
         binding.agreementButton.setOnClickListener {
-            viewModel.openAgreement()
+            val termsUrl = getString(R.string.user_agreement_url)
+            viewModel.openAgreement(termsUrl)
         }
     }
 
