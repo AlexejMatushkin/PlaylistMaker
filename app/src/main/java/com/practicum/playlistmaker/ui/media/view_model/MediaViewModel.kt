@@ -1,18 +1,19 @@
 package com.practicum.playlistmaker.ui.media.view_model
 
-import android.media.MediaPlayer
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.domain.media.MediaPlayerRepository
 import com.practicum.playlistmaker.domain.search.models.Track
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-class MediaViewModel : ViewModel() {
+class MediaViewModel(
+    private val mediaPlayerRepository: MediaPlayerRepository
+) : ViewModel() {
 
     // Состояние плеера
     private val _playerState = MutableLiveData<MediaState>(MediaState.Default)
@@ -22,12 +23,8 @@ class MediaViewModel : ViewModel() {
     private val _currentPosition = MutableLiveData<Long>(0)
     val currentPosition: LiveData<Long> = _currentPosition
 
-    // Медиаплеер
-    private var mediaPlayer: MediaPlayer? = null
     private var playbackPosition = 0
     private var progressUpdateJob: Job? = null
-
-    // Данные трека
     private var currentTrack: Track? = null
 
     fun loadTrack(track: Track) {
@@ -45,76 +42,62 @@ class MediaViewModel : ViewModel() {
 
         _playerState.value = MediaState.Default
 
-        mediaPlayer = MediaPlayer().apply {
-            setDataSource(previewUrl)
-            prepareAsync()
-
-            setOnPreparedListener {
+        mediaPlayerRepository.preparePlayer(
+            url = previewUrl,
+            onPrepared = {
                 _playerState.value = MediaState.Prepared
                 if (playbackPosition > 0) {
-                    seekTo(playbackPosition)
+                    mediaPlayerRepository.seekTo(playbackPosition)
                 }
-            }
-
-            setOnCompletionListener {
+            },
+            onCompletion = {
                 _playerState.value = MediaState.Prepared
                 _currentPosition.value = 0
                 stopProgressUpdates()
-            }
-
-            setOnErrorListener { _, _, _ ->
+            },
+            onError = {
                 _playerState.value = MediaState.Error
-                true
             }
-        }
+        )
     }
 
     fun play() {
-        mediaPlayer?.let {
-            if (it.isPlaying) return
+        if (mediaPlayerRepository.isPlaying()) return
 
-            if (_playerState.value == MediaState.Prepared || _playerState.value == MediaState.Paused) {
-                if (playbackPosition > 0) {
-                    it.seekTo(playbackPosition)
-                }
-                it.start()
-                _playerState.value = MediaState.Playing
-                startProgressUpdates()
+        if (_playerState.value == MediaState.Prepared || _playerState.value == MediaState.Paused) {
+            if (playbackPosition > 0) {
+                mediaPlayerRepository.seekTo(playbackPosition)
             }
+            mediaPlayerRepository.play()
+            _playerState.value = MediaState.Playing
+            startProgressUpdates()
         }
     }
 
     fun pause() {
-        mediaPlayer?.let {
-            if (it.isPlaying) {
-                playbackPosition = it.currentPosition
-                it.pause()
-                _playerState.value = MediaState.Paused
-                stopProgressUpdates()
-            }
+        if (mediaPlayerRepository.isPlaying()) {
+            playbackPosition = mediaPlayerRepository.getCurrentPosition()
+            mediaPlayerRepository.pause()
+            _playerState.value = MediaState.Paused
+            stopProgressUpdates()
         }
     }
 
     fun togglePlay() {
         when (_playerState.value) {
-            MediaState.Playing -> pause()
-            MediaState.Prepared, MediaState.Paused -> play()
-            MediaState.Default -> {
-                releasePlayer()
-                preparePlayer()
+            MediaState.Playing -> {
+                pause()
             }
+            MediaState.Prepared, MediaState.Paused -> {
+                play()
+            }
+            MediaState.Default -> {}
             else -> {}
         }
     }
 
     fun releasePlayer() {
-        mediaPlayer?.let {
-            if (it.isPlaying) {
-                it.stop()
-            }
-            it.release()
-        }
-        mediaPlayer = null
+        mediaPlayerRepository.release()
         playbackPosition = 0
         _playerState.value = MediaState.Default
         _currentPosition.value = 0
@@ -123,12 +106,10 @@ class MediaViewModel : ViewModel() {
 
     private fun startProgressUpdates() {
         stopProgressUpdates()
-        progressUpdateJob = viewModelScope.launch(Dispatchers.Main) {
+        progressUpdateJob = viewModelScope.launch {
             while (true) {
-                mediaPlayer?.let {
-                    if (it.isPlaying) {
-                        _currentPosition.value = it.currentPosition.toLong()
-                    }
+                if (mediaPlayerRepository.isPlaying()) {
+                    _currentPosition.value = mediaPlayerRepository.getCurrentPosition().toLong()
                 }
                 delay(PROGRESS_UPDATE_INTERVAL_MS)
             }
