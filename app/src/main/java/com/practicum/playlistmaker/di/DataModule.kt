@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.di
 
 import android.content.Context
+import android.media.MediaPlayer
 import com.google.gson.Gson
 import com.practicum.playlistmaker.data.NetworkClient
 import com.practicum.playlistmaker.data.media.repository.MediaPlayerRepositoryImpl
@@ -73,7 +74,11 @@ val dataModule = module {
     }
 
     // ============= MEDIA PLAYER =============
-    single<MediaPlayerRepository> {
-        MediaPlayerRepositoryImpl()
+    factory<() -> MediaPlayer> { { MediaPlayer() } }
+
+    factory<MediaPlayerRepository> {
+        MediaPlayerRepositoryImpl(
+            mediaPlayerFactory = get()
+        )
     }
 }

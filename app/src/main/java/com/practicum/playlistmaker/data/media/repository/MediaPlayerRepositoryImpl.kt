@@ -3,17 +3,22 @@ package com.practicum.playlistmaker.data.media.repository
 import android.media.MediaPlayer
 import com.practicum.playlistmaker.domain.media.MediaPlayerRepository
 
-class MediaPlayerRepositoryImpl : MediaPlayerRepository {
+class MediaPlayerRepositoryImpl(
+    private val mediaPlayerFactory: () -> MediaPlayer
+) : MediaPlayerRepository {
 
     private var mediaPlayer: MediaPlayer? = null
     private var onPreparedCallback: (() -> Unit)? = null
     private var onCompletionCallback: (() -> Unit)? = null
     private var onErrorCallback: (() -> Unit)? = null
-
     private var isPrepared = false
 
-    override fun preparePlayer(url: String, onPrepared: () -> Unit, onCompletion: () -> Unit, onError: () -> Unit) {
-
+    override fun preparePlayer(
+        url: String,
+        onPrepared: () -> Unit,
+        onCompletion: () -> Unit,
+        onError: () -> Unit
+    ) {
         release()
 
         this.onPreparedCallback = onPrepared
@@ -21,9 +26,7 @@ class MediaPlayerRepositoryImpl : MediaPlayerRepository {
         this.onErrorCallback = onError
         isPrepared = false
 
-
-
-        mediaPlayer = MediaPlayer().apply {
+        mediaPlayer = mediaPlayerFactory().apply {
             setDataSource(url)
             prepareAsync()
 
@@ -68,6 +71,7 @@ class MediaPlayerRepositoryImpl : MediaPlayerRepository {
         onPreparedCallback = null
         onCompletionCallback = null
         onErrorCallback = null
+        isPrepared = false
     }
 
     override fun isPlaying(): Boolean {
