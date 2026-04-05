@@ -15,11 +15,12 @@ import com.practicum.playlistmaker.databinding.ActivityMediaBinding
 import com.practicum.playlistmaker.domain.search.models.Track
 import com.practicum.playlistmaker.ui.media.view_model.MediaState
 import com.practicum.playlistmaker.ui.media.view_model.MediaViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MediaActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMediaBinding
-    private lateinit var viewModel: MediaViewModel
+
+    private val viewModel: MediaViewModel by viewModel()
     private lateinit var track: Track
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +47,6 @@ class MediaActivity : AppCompatActivity() {
             return
         }
 
-        viewModel = ViewModelProvider(this)[MediaViewModel::class.java]
         viewModel.loadTrack(track)
 
         setupViews()
@@ -138,16 +138,12 @@ class MediaActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (::viewModel.isInitialized) {
-            viewModel.pause()
-        }
+        viewModel.pause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (::viewModel.isInitialized) {
-            viewModel.releasePlayer()
-        }
+        viewModel.releasePlayer()
     }
 
     companion object {

@@ -3,23 +3,16 @@ package com.practicum.playlistmaker.data.network
 import com.practicum.playlistmaker.data.NetworkClient
 import com.practicum.playlistmaker.data.dto.Response
 import com.practicum.playlistmaker.data.search.dto.SearchRequest
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 
-class RetrofitNetworkClient : NetworkClient {
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val iTunesService = retrofit.create(ITunesApiService::class.java)
+class RetrofitNetworkClient(
+    private val iTunesApiService: ITunesApiService
+) : NetworkClient {
 
     override fun doRequest(dto: Any): Response {
         return if (dto is SearchRequest) {
             try {
-                val response = iTunesService.search(dto.expression).execute()
+                val response = iTunesApiService.search(dto.expression).execute()
                 val body = response.body()
                 body?.apply { resultCode = response.code() } ?: Response().apply { resultCode = response.code() }
             } catch (_: IOException) {
@@ -30,9 +23,5 @@ class RetrofitNetworkClient : NetworkClient {
         } else {
             Response().apply { resultCode = 400 }
         }
-    }
-
-    companion object {
-        private const val BASE_URL = "https://itunes.apple.com"
     }
 }
