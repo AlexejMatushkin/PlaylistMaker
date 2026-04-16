@@ -32,11 +32,6 @@
         app:tabTextColor="?attr/colorOnSurface"
         android:contentDescription="@string/tabs_description" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/gray" />
-
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"
         android:layout_width="match_parent"

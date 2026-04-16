@@ -15,6 +15,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MediaLibraryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMediaLibraryBinding
+    private var tabMediator: TabLayoutMediator? = null
     private val viewModel: MediaLibraryViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,12 +46,18 @@ class MediaLibraryActivity : AppCompatActivity() {
         val pagerAdapter = MediaLibraryPagerAdapter(this)
         binding.viewPager.adapter = pagerAdapter
 
-        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+        tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> getString(R.string.favorite_tracks)
                 1 -> getString(R.string.playlists)
                 else -> ""
             }
-        }.attach()
+        }
+        tabMediator?.attach()
+    }
+
+    override fun onDestroy() {
+        tabMediator?.detach()
+        super.onDestroy()
     }
 }

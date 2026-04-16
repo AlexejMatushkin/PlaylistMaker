@@ -14,9 +14,8 @@ class MediaLibraryPagerAdapter(
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
-            0 -> FavoriteTracksFragment()
-            1 -> PlaylistsFragment()
-            else -> throw IndexOutOfBoundsException()
+            0 -> FavoriteTracksFragment.newInstance()
+            else -> PlaylistsFragment.newInstance()
         }
     }
 }
