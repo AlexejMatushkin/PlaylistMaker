@@ -19,6 +19,10 @@
     <dimen name="padding_text_top">10dp</dimen>
     <dimen name="button_size">48dp</dimen>
     <dimen name="padding_horizontal">16dp</dimen>
+    <dimen name="padding_horizontal_24">24dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="margin_top">48dp</dimen>
+    <dimen name="margin_top_medium">24dp</dimen>
 
     <!-- Размеры обложки -->
     <dimen name="track_artwork_size">45dp</dimen>
@@ -40,6 +44,11 @@
     <!-- Размеры текста -->
     <dimen name="track_name_text_size">16sp</dimen>
     <dimen name="track_secondary_text_size">11sp</dimen>
+    <dimen name="text_size_19">19sp</dimen>
+    <dimen name="text_size_14">14sp</dimen>
+
+    <!-- Размеры (Corners) -->
+    <dimen name="button_radius_refresh">54dp</dimen>
 
     <!-- Ширина имени исполнителя -->
     <dimen name="track_artist_width">54dp</dimen>

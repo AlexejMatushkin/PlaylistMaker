@@ -9,6 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityMainBinding
 import com.practicum.playlistmaker.ui.media.activity.MediaActivity
+import com.practicum.playlistmaker.ui.mediaLibrary.activity.MediaLibraryActivity
 import com.practicum.playlistmaker.ui.search.activity.SearchActivity
 import com.practicum.playlistmaker.ui.settings.activity.SettingsActivity
 
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         mediaButton.setOnClickListener {
-            navigateTo<MediaActivity>()
+            navigateTo<MediaLibraryActivity>()
         }
 
         settingsButton.setOnClickListener {
