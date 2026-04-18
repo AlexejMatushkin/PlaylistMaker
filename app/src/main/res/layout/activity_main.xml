@@ -37,7 +37,7 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/media_button"
             app:icon="@drawable/ic_media_library_24"
-            android:text="@string/second_button_name"
+            android:text="@string/media_library"
             style="@style/ButtonMainStyle"/>
 
         <com.google.android.material.button.MaterialButton

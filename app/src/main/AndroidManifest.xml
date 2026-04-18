@@ -21,6 +21,9 @@
             android:name=".ui.settings.activity.SettingsActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.mediaLibrary.activity.MediaLibraryActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.main.activity.MainActivity"
             android:exported="true">
             <intent-filter>
