@@ -1,61 +1,55 @@
-package com.practicum.playlistmaker.ui.media.activity
+package com.practicum.playlistmaker.ui.player.fragment
 
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivityMediaBinding
+import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
 import com.practicum.playlistmaker.domain.search.models.Track
-import com.practicum.playlistmaker.ui.media.view_model.MediaState
-import com.practicum.playlistmaker.ui.media.view_model.MediaViewModel
+import com.practicum.playlistmaker.ui.player.view_model.MediaState
+import com.practicum.playlistmaker.ui.player.view_model.PlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class MediaActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMediaBinding
+class PlayerFragment : Fragment() {
 
-    private val viewModel: MediaViewModel by viewModel()
-    private lateinit var track: Track
+    private var _binding: FragmentPlayerBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: PlayerViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        enableEdgeToEdge()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        binding = ActivityMediaBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.media) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra(EXTRA_TRACK, Track::class.java)
+        val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getParcelable(EXTRA_TRACK, Track::class.java)
         } else {
             @Suppress("DEPRECATION")
-            intent.getParcelableExtra(EXTRA_TRACK)
+            arguments?.getParcelable(EXTRA_TRACK)
         } ?: run {
-            finish()
+            findNavController().popBackStack()
             return
         }
 
         viewModel.loadTrack(track)
 
-        setupViews()
+        setupViews(track)
         setupBackButton()
         setupPlayButton()
         observeViewModel()
     }
 
-    private fun setupViews() = binding.apply {
+    private fun setupViews(track: Track) = binding.apply {
         trackName.text = track.trackName
         artistName.text = track.artistName
         genre.text = track.primaryGenreName ?: ""
@@ -66,7 +60,7 @@ class MediaActivity : AppCompatActivity() {
         val placeholder = R.drawable.ic_music_note
         val highResUrl = track.getCoverArtwork()
         if (highResUrl != null) {
-            Glide.with(this@MediaActivity)
+            Glide.with(requireContext())
                 .load(highResUrl)
                 .placeholder(placeholder)
                 .error(placeholder)
@@ -100,7 +94,7 @@ class MediaActivity : AppCompatActivity() {
     private fun setupBackButton() {
         binding.backButton.setOnClickListener {
             viewModel.releasePlayer()
-            finish()
+            findNavController().popBackStack()
         }
     }
 
@@ -111,7 +105,7 @@ class MediaActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() = binding.apply {
-        viewModel.playerState.observe(this@MediaActivity) { state ->
+        viewModel.playerState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 MediaState.Playing -> {
                     playButton.setImageResource(R.drawable.ic_pause)
@@ -131,7 +125,7 @@ class MediaActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.currentPosition.observe(this@MediaActivity) { position ->
+        viewModel.currentPosition.observe(viewLifecycleOwner) { position ->
             trackProgress.text = viewModel.getFormattedTime(position)
         }
     }
@@ -141,9 +135,10 @@ class MediaActivity : AppCompatActivity() {
         viewModel.pause()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
         viewModel.releasePlayer()
+        _binding = null
+        super.onDestroyView()
     }
 
     companion object {

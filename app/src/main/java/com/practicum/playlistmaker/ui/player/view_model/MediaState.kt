@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.media.view_model
+package com.practicum.playlistmaker.ui.player.view_model
 
 sealed class MediaState {
     object Default : MediaState()

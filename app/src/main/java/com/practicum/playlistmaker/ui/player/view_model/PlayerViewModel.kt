@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.media.view_model
+package com.practicum.playlistmaker.ui.player.view_model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,7 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-class MediaViewModel(
+class PlayerViewModel(
     private val mediaPlayerRepository: MediaPlayerRepository
 ) : ViewModel() {
 

@@ -1,46 +1,35 @@
-package com.practicum.playlistmaker.ui.settings.activity
+package com.practicum.playlistmaker.ui.settings.fragment
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
+import com.practicum.playlistmaker.databinding.FragmentSettingsBinding
 import com.practicum.playlistmaker.ui.settings.view_model.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsFragment : Fragment() {
 
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: SettingsViewModel by viewModel()
-    private lateinit var binding: ActivitySettingsBinding
     private var isUpdatingFromViewModel = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
-        setupToolbar()
         setupShareButton()
         setupSupportButton()
         setupAgreementButton()
         setupThemeSwitcher()
         observeViewModel()
-    }
-
-    private fun setupToolbar() {
-        binding.backToolbarSettings.setNavigationOnClickListener {
-            finish()
-        }
     }
 
     private fun setupShareButton() {
@@ -76,12 +65,17 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.themeState.observe(this) { isDarkTheme ->
+        viewModel.themeState.observe(viewLifecycleOwner) { isDarkTheme ->
             if (binding.themeSwitch.isChecked != isDarkTheme) {
                 isUpdatingFromViewModel = true
                 binding.themeSwitch.isChecked = isDarkTheme
                 isUpdatingFromViewModel = false
             }
         }
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
     }
 }
