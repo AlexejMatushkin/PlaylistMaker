@@ -28,6 +28,10 @@ class SearchViewModel(
 
     private var lastQuery = ""
 
+    private var isClickAllowed = true
+    private val clickHandler = Handler(Looper.getMainLooper())
+    private val clickRunnable = Runnable { isClickAllowed = true }
+
     init {
         loadHistory()
     }
@@ -130,12 +134,23 @@ class SearchViewModel(
         }
     }
 
+    fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            clickHandler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
     override fun onCleared() {
         super.onCleared()
         handler.removeCallbacksAndMessages(null)
+        clickHandler.removeCallbacksAndMessages(null)
     }
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }

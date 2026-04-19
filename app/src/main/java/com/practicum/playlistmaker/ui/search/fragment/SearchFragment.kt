@@ -1,14 +1,18 @@
 package com.practicum.playlistmaker.ui.search.fragment
 
+import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -31,22 +35,37 @@ class SearchFragment : Fragment() {
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
 
-    private val handler = Handler(Looper.getMainLooper())
-    private var isClickAllowed = true
-    private val clickRunnable = Runnable { isClickAllowed = true }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(
+                left = systemBars.left,
+                top = systemBars.top,
+                right = systemBars.right,
+                bottom = systemBars.bottom
+            )
+            insets
+        }
 
         initViews()
         setupRecyclerView()
         setupSearchField()
         observeViewModel()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            binding.searchEditText.textCursorDrawable = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.cursor_color
+            )
+        }
     }
 
     private fun initViews() {
@@ -72,10 +91,8 @@ class SearchFragment : Fragment() {
     }
 
     private fun handleTrackClickWithDebounce(track: Track) {
-        if (isClickAllowed) {
-            isClickAllowed = false
+        if (viewModel.clickDebounce()) {
             viewModel.addToHistory(track)
-            handler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
 
             val bundle = Bundle().apply {
                 putParcelable(PlayerFragment.EXTRA_TRACK, track)
@@ -217,15 +234,5 @@ class SearchFragment : Fragment() {
 
     private fun hideHistory() = binding.apply {
         searchHistoryContainer.isVisible = false
-    }
-
-    override fun onDestroyView() {
-        _binding = null
-        handler.removeCallbacksAndMessages(null)
-        super.onDestroyView()
-    }
-
-    companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }

@@ -3,7 +3,6 @@ package com.practicum.playlistmaker.ui.root.activity
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
-import android.view.ViewTreeObserver
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -28,14 +27,12 @@ class RootActivity : AppCompatActivity() {
 
         binding.bottomNavigationView.setupWithNavController(navController)
 
-        // Скрываем панель на плеере (всегда)
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.playerFragment) {
                 binding.bottomNavigationView.visibility = View.GONE
             }
         }
 
-        // Отслеживаем клавиатуру на остальных экранах
         binding.root.viewTreeObserver.addOnGlobalLayoutListener {
             val rect = Rect()
             binding.root.getWindowVisibleDisplayFrame(rect)
@@ -43,7 +40,6 @@ class RootActivity : AppCompatActivity() {
             val keypadHeight = screenHeight - rect.bottom
             val isKeyboardVisible = keypadHeight > screenHeight * 0.15
 
-            // Не трогаем панель на плеере (она уже скрыта)
             if (navController.currentDestination?.id != R.id.playerFragment) {
                 binding.bottomNavigationView.visibility = if (isKeyboardVisible) View.GONE else View.VISIBLE
             }

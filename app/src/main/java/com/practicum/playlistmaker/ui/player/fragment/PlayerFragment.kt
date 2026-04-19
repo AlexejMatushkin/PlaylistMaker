@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -13,7 +16,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
 import com.practicum.playlistmaker.domain.search.models.Track
-import com.practicum.playlistmaker.ui.player.view_model.MediaState
+import com.practicum.playlistmaker.ui.player.view_model.PlayerState
 import com.practicum.playlistmaker.ui.player.view_model.PlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -30,6 +33,17 @@ class PlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(
+                left = systemBars.left,
+                top = systemBars.top,
+                right = systemBars.right,
+                bottom = systemBars.bottom
+            )
+            insets
+        }
 
         val track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable(EXTRA_TRACK, Track::class.java)
@@ -107,19 +121,19 @@ class PlayerFragment : Fragment() {
     private fun observeViewModel() = binding.apply {
         viewModel.playerState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                MediaState.Playing -> {
+                PlayerState.Playing -> {
                     playButton.setImageResource(R.drawable.ic_pause)
                     playButton.isEnabled = true
                 }
-                MediaState.Prepared, MediaState.Paused -> {
+                PlayerState.Prepared, PlayerState.Paused -> {
                     playButton.setImageResource(R.drawable.ic_play_circle)
                     playButton.isEnabled = true
                 }
-                MediaState.Default -> {
+                PlayerState.Default -> {
                     playButton.setImageResource(R.drawable.ic_play_circle)
                     playButton.isEnabled = true
                 }
-                MediaState.Error -> {
+                PlayerState.Error -> {
                     playButton.isEnabled = false
                 }
             }

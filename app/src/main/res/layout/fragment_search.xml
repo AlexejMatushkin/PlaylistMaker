@@ -32,7 +32,8 @@
             android:hint="@string/search"
             android:drawableStart="@drawable/ic_search_24"
             android:textColor="@color/black_main"
-            tools:ignore="TextFields"/>
+            tools:ignore="TextFields"
+            android:textCursorDrawable="@drawable/cursor_color"/>
 
         <ImageButton
             android:id="@+id/search_clear_button"
