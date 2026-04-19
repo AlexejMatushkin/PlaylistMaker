@@ -4,7 +4,7 @@ import android.content.Context
 import android.media.MediaPlayer
 import com.google.gson.Gson
 import com.practicum.playlistmaker.data.NetworkClient
-import com.practicum.playlistmaker.data.media.repository.MediaPlayerRepositoryImpl
+import com.practicum.playlistmaker.data.player.repository.MediaPlayerRepositoryImpl
 import com.practicum.playlistmaker.data.network.ITunesApiService
 import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.data.search.impl.SearchHistoryRepositoryImpl

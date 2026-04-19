@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.media.view_model
+package com.practicum.playlistmaker.ui.player.view_model
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,13 +11,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-class MediaViewModel(
+class PlayerViewModel(
     private val mediaPlayerRepository: MediaPlayerRepository
 ) : ViewModel() {
 
     // Состояние плеера
-    private val _playerState = MutableLiveData<MediaState>(MediaState.Default)
-    val playerState: LiveData<MediaState> = _playerState
+    private val _playerState = MutableLiveData<PlayerState>(PlayerState.Default)
+    val playerState: LiveData<PlayerState> = _playerState
 
     // Текущая позиция воспроизведения
     private val _currentPosition = MutableLiveData<Long>(0)
@@ -36,27 +36,27 @@ class MediaViewModel(
     private fun preparePlayer() {
         val previewUrl = currentTrack?.previewUrl
         if (previewUrl.isNullOrBlank()) {
-            _playerState.value = MediaState.Error
+            _playerState.value = PlayerState.Error
             return
         }
 
-        _playerState.value = MediaState.Default
+        _playerState.value = PlayerState.Default
 
         mediaPlayerRepository.preparePlayer(
             url = previewUrl,
             onPrepared = {
-                _playerState.value = MediaState.Prepared
+                _playerState.value = PlayerState.Prepared
                 if (playbackPosition > 0) {
                     mediaPlayerRepository.seekTo(playbackPosition)
                 }
             },
             onCompletion = {
-                _playerState.value = MediaState.Prepared
+                _playerState.value = PlayerState.Prepared
                 _currentPosition.value = 0
                 stopProgressUpdates()
             },
             onError = {
-                _playerState.value = MediaState.Error
+                _playerState.value = PlayerState.Error
             }
         )
     }
@@ -64,12 +64,12 @@ class MediaViewModel(
     fun play() {
         if (mediaPlayerRepository.isPlaying()) return
 
-        if (_playerState.value == MediaState.Prepared || _playerState.value == MediaState.Paused) {
+        if (_playerState.value == PlayerState.Prepared || _playerState.value == PlayerState.Paused) {
             if (playbackPosition > 0) {
                 mediaPlayerRepository.seekTo(playbackPosition)
             }
             mediaPlayerRepository.play()
-            _playerState.value = MediaState.Playing
+            _playerState.value = PlayerState.Playing
             startProgressUpdates()
         }
     }
@@ -78,20 +78,20 @@ class MediaViewModel(
         if (mediaPlayerRepository.isPlaying()) {
             playbackPosition = mediaPlayerRepository.getCurrentPosition()
             mediaPlayerRepository.pause()
-            _playerState.value = MediaState.Paused
+            _playerState.value = PlayerState.Paused
             stopProgressUpdates()
         }
     }
 
     fun togglePlay() {
         when (_playerState.value) {
-            MediaState.Playing -> {
+            PlayerState.Playing -> {
                 pause()
             }
-            MediaState.Prepared, MediaState.Paused -> {
+            PlayerState.Prepared, PlayerState.Paused -> {
                 play()
             }
-            MediaState.Default -> {}
+            PlayerState.Default -> {}
             else -> {}
         }
     }
@@ -99,7 +99,7 @@ class MediaViewModel(
     fun releasePlayer() {
         mediaPlayerRepository.release()
         playbackPosition = 0
-        _playerState.value = MediaState.Default
+        _playerState.value = PlayerState.Default
         _currentPosition.value = 0
         stopProgressUpdates()
     }

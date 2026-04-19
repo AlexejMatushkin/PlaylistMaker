@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.search.activity.SearchActivity">
+    tools:context=".ui.search.fragment.SearchFragment">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_search"
@@ -14,10 +14,8 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_marginTop="@dimen/margin_small"
         android:layout_marginBottom="@dimen/margin_small"
-        app:navigationIcon="@drawable/ic_arrow_back_24"
-        app:navigationIconTint="?attr/colorOnSurface"
-        app:title="@string/search_title"
-        app:titleTextAppearance="@style/SearchTitleTextAppearance" />
+        app:title="@string/search"
+        app:titleTextAppearance="@style/SearchTitleTextAppearance"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -31,10 +29,11 @@
             android:imeOptions="actionDone"
             android:singleLine="true"
             android:autofillHints=""
-            android:hint="@string/search_hint"
+            android:hint="@string/search"
             android:drawableStart="@drawable/ic_search_24"
             android:textColor="@color/black_main"
-            tools:ignore="TextFields"/>
+            tools:ignore="TextFields"
+            android:textCursorDrawable="@drawable/cursor_color"/>
 
         <ImageButton
             android:id="@+id/search_clear_button"

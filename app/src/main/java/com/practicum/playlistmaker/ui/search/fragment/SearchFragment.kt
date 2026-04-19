@@ -1,57 +1,71 @@
-package com.practicum.playlistmaker.ui.search.activity
+package com.practicum.playlistmaker.ui.search.fragment
 
-import android.content.Intent
+import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.domain.search.models.Track
-import com.practicum.playlistmaker.ui.media.activity.MediaActivity
+import com.practicum.playlistmaker.ui.player.fragment.PlayerFragment
 import com.practicum.playlistmaker.ui.search.adapter.TrackAdapter
 import com.practicum.playlistmaker.ui.search.view_model.SearchHistoryState
 import com.practicum.playlistmaker.ui.search.view_model.SearchState
 import com.practicum.playlistmaker.ui.search.view_model.SearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
     private val viewModel: SearchViewModel by viewModel()
-    private lateinit var binding: ActivitySearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var historyAdapter: TrackAdapter
 
-    private val handler = Handler(Looper.getMainLooper())
-    private var isClickAllowed = true
-    private val clickRunnable = Runnable { isClickAllowed = true }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+    @SuppressLint("ObsoleteSdkInt")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.updatePadding(
+                left = systemBars.left,
+                top = systemBars.top,
+                right = systemBars.right,
+                bottom = systemBars.bottom
+            )
             insets
         }
 
         initViews()
         setupRecyclerView()
         setupSearchField()
-        setupToolbar()
         observeViewModel()
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            binding.searchEditText.textCursorDrawable = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.cursor_color
+            )
+        }
     }
 
     private fun initViews() {
@@ -68,24 +82,22 @@ class SearchActivity : AppCompatActivity() {
         trackAdapter = TrackAdapter()
         trackAdapter.setOnItemClickListener(itemClickListener)
         rvTracks.adapter = trackAdapter
-        rvTracks.layoutManager = LinearLayoutManager(this@SearchActivity)
+        rvTracks.layoutManager = LinearLayoutManager(requireContext())
 
         historyAdapter = TrackAdapter()
         historyAdapter.setOnItemClickListener(itemClickListener)
         searchHistoryRecyclerView.adapter = historyAdapter
-        searchHistoryRecyclerView.layoutManager = LinearLayoutManager(this@SearchActivity)
+        searchHistoryRecyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
 
     private fun handleTrackClickWithDebounce(track: Track) {
-        if (isClickAllowed) {
-            isClickAllowed = false
+        if (viewModel.clickDebounce()) {
             viewModel.addToHistory(track)
-            handler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
 
-            val intent = Intent(this, MediaActivity::class.java).apply {
-                putExtra(MediaActivity.EXTRA_TRACK, track)
+            val bundle = Bundle().apply {
+                putParcelable(PlayerFragment.EXTRA_TRACK, track)
             }
-            startActivity(intent)
+            findNavController().navigate(R.id.action_search_to_player, bundle)
         }
     }
 
@@ -95,8 +107,8 @@ class SearchActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 val query = searchEditText.text.toString().trim()
                 if (query.isNotEmpty()) {
-                    val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+                    val imm = requireContext().getSystemService(InputMethodManager::class.java)
+                    imm?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
                     searchEditText.clearFocus()
                     viewModel.searchImmediately(query)
                 }
@@ -124,8 +136,8 @@ class SearchActivity : AppCompatActivity() {
 
         searchClearButton.setOnClickListener {
             searchEditText.text.clear()
-            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+            val imm = requireContext().getSystemService(InputMethodManager::class.java)
+            imm?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
             viewModel.clearSearch()
         }
 
@@ -134,14 +146,8 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupToolbar() {
-        binding.toolbarSearch.setNavigationOnClickListener {
-            finish()
-        }
-    }
-
     private fun observeViewModel() = binding.apply {
-        viewModel.searchState.observe(this@SearchActivity) { state ->
+        viewModel.searchState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is SearchState.Loading -> showLoading()
                 is SearchState.Success -> showTracks(state.tracks)
@@ -151,13 +157,14 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.historyState.observe(this@SearchActivity) { state ->
+        viewModel.historyState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is SearchHistoryState.History -> showHistory(state.tracks)
                 is SearchHistoryState.Empty -> hideHistory()
             }
         }
     }
+
 
     private fun showLoading() = binding.apply {
         progressBar.isVisible = true
@@ -227,14 +234,5 @@ class SearchActivity : AppCompatActivity() {
 
     private fun hideHistory() = binding.apply {
         searchHistoryContainer.isVisible = false
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        handler.removeCallbacksAndMessages(null)
-    }
-
-    companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
