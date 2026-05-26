@@ -6,13 +6,16 @@ import com.practicum.playlistmaker.data.search.dto.SearchResponse
 import com.practicum.playlistmaker.domain.search.models.SearchResult
 import com.practicum.playlistmaker.domain.search.models.Track
 import com.practicum.playlistmaker.domain.search.repository.TracksRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
 
-    override fun searchTracks(expression: String): SearchResult {
+    override fun searchTracks(expression: String): Flow<SearchResult> = flow {
         val response = networkClient.doRequest(SearchRequest(expression))
-
-        return when (response.resultCode) {
+        when (response.resultCode) {
             200 -> {
                 val tracks = (response as SearchResponse).results.mapNotNull { dto ->
                     if (dto.trackId != null && !dto.trackName.isNullOrEmpty() && !dto.artistName.isNullOrEmpty()) {
@@ -32,14 +35,10 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
                         null
                     }
                 }
-                SearchResult.Success(tracks)
+                emit(SearchResult.Success(tracks))
             }
-            -1, -2 -> {
-                SearchResult.Error
-            }
-            else -> {
-                SearchResult.Error
-            }
+            -1, -2 -> emit(SearchResult.Error)
+            else -> emit(SearchResult.Error)
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }

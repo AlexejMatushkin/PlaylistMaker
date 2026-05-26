@@ -1,15 +1,15 @@
 package com.practicum.playlistmaker.ui.search.view_model
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.search.interactor.SearchHistoryInteractor
+import com.practicum.playlistmaker.domain.search.interactor.TracksInteractor
 import com.practicum.playlistmaker.domain.search.models.SearchResult
 import com.practicum.playlistmaker.domain.search.models.Track
-import com.practicum.playlistmaker.domain.search.interactor.TracksInteractor
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
@@ -17,8 +17,7 @@ class SearchViewModel(
     private val searchHistoryInteractor: SearchHistoryInteractor
 ) : ViewModel() {
 
-    private val handler = Handler(Looper.getMainLooper())
-    private var searchRunnable: Runnable? = null
+    private var searchJob: Job? = null
 
     private val _searchState = MutableLiveData<SearchState>(SearchState.Empty)
     val searchState: LiveData<SearchState> = _searchState
@@ -27,10 +26,7 @@ class SearchViewModel(
     val historyState: LiveData<SearchHistoryState> = _historyState
 
     private var lastQuery = ""
-
-    private var isClickAllowed = true
-    private val clickHandler = Handler(Looper.getMainLooper())
-    private val clickRunnable = Runnable { isClickAllowed = true }
+    private var clickJob: Job? = null
 
     init {
         loadHistory()
@@ -55,12 +51,12 @@ class SearchViewModel(
 
         lastQuery = query
 
-        searchRunnable?.let { handler.removeCallbacks(it) }
+        searchJob?.cancel()
 
-        searchRunnable = Runnable {
+        searchJob = viewModelScope.launch {
+            delay(SEARCH_DEBOUNCE_DELAY)
             performSearch(query)
         }
-        handler.postDelayed(searchRunnable!!, SEARCH_DEBOUNCE_DELAY)
     }
 
     fun searchImmediately(query: String) {
@@ -71,32 +67,24 @@ class SearchViewModel(
 
         lastQuery = query
 
-        searchRunnable?.let { handler.removeCallbacks(it) }
+        searchJob?.cancel()
 
         performSearch(query)
     }
 
     private fun performSearch(query: String) {
         _searchState.value = SearchState.Loading
-
-        tracksInteractor.searchTracks(query, object : TracksInteractor.TracksConsumer {
-            override fun consume(result: SearchResult) {
-                viewModelScope.launch {
-                    _searchState.value = when (result) {
-                        is SearchResult.Success -> {
-                            if (result.tracks.isEmpty()) {
-                                SearchState.NoResults
-                            } else {
-                                SearchState.Success(result.tracks)
-                            }
-                        }
-                        is SearchResult.Error -> {
-                            SearchState.Error
-                        }
+        viewModelScope.launch {
+            tracksInteractor.searchTracks(query).collect { result ->
+                _searchState.value = when (result) {
+                    is SearchResult.Success -> {
+                        if (result.tracks.isEmpty()) SearchState.NoResults
+                        else SearchState.Success(result.tracks)
                     }
+                    is SearchResult.Error -> SearchState.Error
                 }
             }
-        })
+        }
     }
 
     fun addToHistory(track: Track) {
@@ -135,18 +123,14 @@ class SearchViewModel(
     }
 
     fun clickDebounce(): Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            clickHandler.postDelayed(clickRunnable, CLICK_DEBOUNCE_DELAY)
-        }
-        return current
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        handler.removeCallbacksAndMessages(null)
-        clickHandler.removeCallbacksAndMessages(null)
+       return if (clickJob?.isActive == true) {
+           false
+       } else {
+           clickJob = viewModelScope.launch {
+               delay(CLICK_DEBOUNCE_DELAY)
+           }
+           true
+       }
     }
 
     companion object {

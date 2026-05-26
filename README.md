@@ -4,45 +4,46 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-0095D5?&style=for-the-badge&logo=kotlin&logoColor=white)
 ![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=for-the-badge&logo=material-design&logoColor=white)
 
-Учебный Android-проект для создания музыкальных плейлистов с красивым Material Design интерфейсом.
-
 ## 📱 О проекте
 
-Простое приложение с основными экранами для изучения навигации в Android.
-Включает главный экран, поиск, медиатеку и настройки.
+**Playlist Maker** — учебное Android-приложение для поиска музыкальных треков, прослушивания отрывков, создания плейлистов и управления избранным.  
+Проект демонстрирует современный подход к разработке под Android с использованием Clean Architecture, MVVM, корутин, Flow, Room и Jetpack Navigation.
 
 ## ✨ Возможности
 
-- **🎵 Главный экран** - красивый интерфейс с кнопками навигации
-- **🔍 Поиск** - экран для поиска музыкальных треков
-- **📚 Медиатека** - управление вашей музыкальной коллекцией
-- **⚙️ Настройки** - персонализация приложения с возможностью смены темы
+- **Поиск треков** через iTunes API с **debounce** (корутины)
+- **Воспроизведение 30-секундных отрывков** с обновлением прогресса (корутины вместо Handler)
+- **Медиатека** с двумя вкладками:
+    - *Избранные треки*
+    - *Плейлисты* (заглушка, готово к расширению)
+- **Настройки** — переключение светлой/тёмной темы с сохранением состояния
+- **Нижняя навигация** (BottomNavigationView) с переключением между экранами «Медиатека», «Поиск», «Настройки»
+- **Адаптивный интерфейс** — поддержка тёмной темы
 
 ## 🚀 Запуск проекта
 
 1. Клонируйте репозиторий:
 ```bash
-git clone https://github.com/your-username/playlist-maker.git
+git clone https://github.com/AlexejMatushkin/PlaylistMaker.git
 ```
 Откройте проект в Android Studio
 
 Запустите на эмуляторе или устройстве  Android
 
-## 📁 Структура проекта
+## 🛠 Технологии и архитектура
 
-```text
-app/
-├── MainActivity.kt          # Главный экран
-├── SearchActivity.kt        # Поиск музыки  
-├── MediaActivity.kt         # Медиатека
-└── SettingsActivity.kt      # Настройки приложения
-└── Track.kt                 # Дата класс
-└── TrackAdapter.kt          # Адаптер треков
-```
+- **Clean Architecture** (слои Data, Domain, Presentation)
+- **MVVM** (ViewModel, LiveData/StateFlow)
+- **Kotlin Coroutines + Flow** (асинхронность, debounce, прогресс плеера)
+- **Room** (хранение избранных треков)
+- **Retrofit** + **OkHttp** (сетевые запросы к iTunes API)
+- **Koin** (Dependency Injection)
+- **Jetpack Navigation Component** (NavController, безопасная навигация между фрагментами)
+- **Glide** (загрузка обложек)
 
 ---
 
-<div align="center">
+<div style="text-align: center;">
 
 ### 🎓 Учебный проект
 **Практикум • 2025**
