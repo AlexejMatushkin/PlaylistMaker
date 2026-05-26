@@ -9,12 +9,11 @@ class RetrofitNetworkClient(
     private val iTunesApiService: ITunesApiService
 ) : NetworkClient {
 
-    override fun doRequest(dto: Any): Response {
+    override suspend fun doRequest(dto: Any): Response {
         return if (dto is SearchRequest) {
             try {
-                val response = iTunesApiService.search(dto.expression).execute()
-                val body = response.body()
-                body?.apply { resultCode = response.code() } ?: Response().apply { resultCode = response.code() }
+                val response = iTunesApiService.search(dto.expression)
+                response.apply { resultCode = 200 }
             } catch (_: IOException) {
                 Response().apply { resultCode = -1 }
             } catch (_: Exception) {
