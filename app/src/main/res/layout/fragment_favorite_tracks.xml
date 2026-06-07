@@ -1,28 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
-    android:orientation="vertical"
     android:background="?attr/colorSurface">
 
-    <ImageView
-        android:id="@+id/ivPlaceholder"
-        android:layout_marginTop="106dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_placeholder_no_results" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFavoriteTracks"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/tvPlaceholderText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_small"
-        android:fontFamily="@font/ys_display_medium"
-        android:text="@string/empty_message_favorites"
-        android:textColor="?attr/colorOnSurface"
-        android:textSize="@dimen/text_size_19"
-        android:gravity="center"
-        android:paddingHorizontal="@dimen/padding_horizontal_24" />
+    <LinearLayout
+        android:id="@+id/emptyPlaceholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="visible"
+        android:paddingHorizontal="24dp">
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/ivPlaceholder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="106dp"
+            android:src="@drawable/ic_placeholder_no_results"
+            android:importantForAccessibility="no" />
+
+        <TextView
+            android:id="@+id/tvPlaceholderText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_small"
+            android:fontFamily="@font/ys_display_medium"
+            android:text="@string/empty_message_favorites"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="@dimen/text_size_19"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+</FrameLayout>

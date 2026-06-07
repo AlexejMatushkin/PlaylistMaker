@@ -8,11 +8,8 @@ class SearchHistoryInteractorImpl(
     private val repository: SearchHistoryRepository
 ) : SearchHistoryInteractor {
 
-    override fun getHistory(): List<Track> = repository.getHistory()
-
-    override fun addTrack(track: Track) = repository.addTrack(track)
-
-    override fun clearHistory() = repository.clearHistory()
-
-    override fun hasHistory(): Boolean = repository.hasHistory()
+    override suspend fun getHistory(): List<Track> = repository.getHistory()
+    override suspend fun addTrack(track: Track) = repository.addTrack(track)
+    override suspend fun clearHistory() = repository.clearHistory()
+    override suspend fun hasHistory(): Boolean = repository.hasHistory()
 }

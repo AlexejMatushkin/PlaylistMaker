@@ -60,6 +60,7 @@ class PlayerFragment : Fragment() {
         setupViews(track)
         setupBackButton()
         setupPlayButton()
+        setupFavoriteButton()
         observeViewModel()
     }
 
@@ -115,6 +116,18 @@ class PlayerFragment : Fragment() {
     private fun setupPlayButton() {
         binding.playButton.setOnClickListener {
             viewModel.togglePlay()
+        }
+    }
+
+    private fun setupFavoriteButton() {
+        val favoriteButton = binding.favoriteButton
+        viewModel.isFavorite.observe(viewLifecycleOwner) { isFav ->
+            favoriteButton.setImageResource(
+                if (isFav) R.drawable.ic_favorite_51 else R.drawable.ic_favorite_border
+            )
+        }
+        favoriteButton.setOnClickListener {
+            viewModel.onFavoriteClicked()
         }
     }
 
