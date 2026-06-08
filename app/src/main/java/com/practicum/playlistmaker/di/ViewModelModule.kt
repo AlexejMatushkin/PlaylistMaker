@@ -27,10 +27,10 @@ val viewModelModule = module {
     }
 
     viewModel {
-        PlayerViewModel(get())
+        PlayerViewModel(get(), get())
     }
 
     viewModel { MediaLibraryViewModel() }
     viewModel { PlaylistsViewModel() }
-    viewModel { FavoriteTracksViewModel() }
+    viewModel { FavoriteTracksViewModel(get())}
 }

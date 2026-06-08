@@ -125,7 +125,6 @@
                 app:layout_constraintBottom_toBottomOf="@id/play_button"
                 app:layout_constraintEnd_toEndOf="@id/right_guideline"
                 app:layout_constraintTop_toTopOf="@id/play_button"
-                app:tint="@android:color/white"
                 tools:ignore="ContentDescription" />
 
         <TextView

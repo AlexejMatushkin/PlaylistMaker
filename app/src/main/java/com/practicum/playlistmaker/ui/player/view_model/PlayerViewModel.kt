@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.practicum.playlistmaker.domain.favorite.interactor.FavoriteInteractor
 import com.practicum.playlistmaker.domain.media.MediaPlayerRepository
 import com.practicum.playlistmaker.domain.search.models.Track
 import kotlinx.coroutines.Job
@@ -12,51 +13,83 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 class PlayerViewModel(
-    private val mediaPlayerRepository: MediaPlayerRepository
+    private val mediaPlayerRepository: MediaPlayerRepository,
+    private val favoriteInteractor: FavoriteInteractor
 ) : ViewModel() {
 
-    // Состояние плеера
-    private val _playerState = MutableLiveData<PlayerState>(PlayerState.Default)
-    val playerState: LiveData<PlayerState> = _playerState
+    private val _screenState = MutableLiveData(PlayerScreenState())
+    val screenState: LiveData<PlayerScreenState> = _screenState
 
-    // Текущая позиция воспроизведения
-    private val _currentPosition = MutableLiveData<Long>(0)
-    val currentPosition: LiveData<Long> = _currentPosition
+    private var playerState: PlayerState = PlayerState.Default
+    private var currentPosition: Long = 0
+    private var isFavorite: Boolean = false
+
+    private fun updateScreenState() {
+        _screenState.value = PlayerScreenState(
+            playerState = playerState,
+            currentPosition = currentPosition,
+            isFavorite = isFavorite
+        )
+    }
 
     private var playbackPosition = 0
     private var progressUpdateJob: Job? = null
     private var currentTrack: Track? = null
 
+
     fun loadTrack(track: Track) {
         currentTrack = track
+        viewModelScope.launch {
+            isFavorite = favoriteInteractor.isFavorite(track.trackId)
+            updateScreenState()
+        }
         releasePlayer()
         preparePlayer()
+    }
+
+    fun onFavoriteClicked() {
+        val track = currentTrack ?: return
+        viewModelScope.launch {
+            if (isFavorite) {
+                favoriteInteractor.removeFromFavorites(track)
+                isFavorite = false
+            } else {
+                favoriteInteractor.addToFavorites(track)
+                isFavorite = true
+            }
+            updateScreenState()
+        }
     }
 
     private fun preparePlayer() {
         val previewUrl = currentTrack?.previewUrl
         if (previewUrl.isNullOrBlank()) {
-            _playerState.value = PlayerState.Error
+            playerState = PlayerState.Error
+            updateScreenState()
             return
         }
 
-        _playerState.value = PlayerState.Default
+        playerState = PlayerState.Default
+        updateScreenState()
 
         mediaPlayerRepository.preparePlayer(
             url = previewUrl,
             onPrepared = {
-                _playerState.value = PlayerState.Prepared
+                playerState = PlayerState.Prepared
                 if (playbackPosition > 0) {
                     mediaPlayerRepository.seekTo(playbackPosition)
                 }
+                updateScreenState()
             },
             onCompletion = {
-                _playerState.value = PlayerState.Prepared
-                _currentPosition.value = 0
+                playerState = PlayerState.Prepared
+                currentPosition = 0
                 stopProgressUpdates()
+                updateScreenState()
             },
             onError = {
-                _playerState.value = PlayerState.Error
+                playerState = PlayerState.Error
+                updateScreenState()
             }
         )
     }
@@ -64,12 +97,13 @@ class PlayerViewModel(
     fun play() {
         if (mediaPlayerRepository.isPlaying()) return
 
-        if (_playerState.value == PlayerState.Prepared || _playerState.value == PlayerState.Paused) {
+        if (playerState == PlayerState.Prepared || playerState == PlayerState.Paused) {
             if (playbackPosition > 0) {
                 mediaPlayerRepository.seekTo(playbackPosition)
             }
             mediaPlayerRepository.play()
-            _playerState.value = PlayerState.Playing
+            playerState = PlayerState.Playing
+            updateScreenState()
             startProgressUpdates()
         }
     }
@@ -78,13 +112,14 @@ class PlayerViewModel(
         if (mediaPlayerRepository.isPlaying()) {
             playbackPosition = mediaPlayerRepository.getCurrentPosition()
             mediaPlayerRepository.pause()
-            _playerState.value = PlayerState.Paused
+            playerState = PlayerState.Paused
+            updateScreenState()
             stopProgressUpdates()
         }
     }
 
     fun togglePlay() {
-        when (_playerState.value) {
+        when (playerState) {
             PlayerState.Playing -> {
                 pause()
             }
@@ -99,8 +134,9 @@ class PlayerViewModel(
     fun releasePlayer() {
         mediaPlayerRepository.release()
         playbackPosition = 0
-        _playerState.value = PlayerState.Default
-        _currentPosition.value = 0
+        playerState = PlayerState.Default
+        currentPosition = 0
+        updateScreenState()
         stopProgressUpdates()
     }
 
@@ -109,7 +145,8 @@ class PlayerViewModel(
         progressUpdateJob = viewModelScope.launch {
             while (true) {
                 if (mediaPlayerRepository.isPlaying()) {
-                    _currentPosition.value = mediaPlayerRepository.getCurrentPosition().toLong()
+                    currentPosition = mediaPlayerRepository.getCurrentPosition().toLong()
+                    updateScreenState()
                 }
                 delay(PROGRESS_UPDATE_INTERVAL_MS)
             }

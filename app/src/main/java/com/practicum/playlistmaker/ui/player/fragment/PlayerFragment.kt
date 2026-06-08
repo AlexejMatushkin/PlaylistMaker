@@ -60,6 +60,7 @@ class PlayerFragment : Fragment() {
         setupViews(track)
         setupBackButton()
         setupPlayButton()
+        setupFavoriteButton()
         observeViewModel()
     }
 
@@ -118,9 +119,16 @@ class PlayerFragment : Fragment() {
         }
     }
 
+    private fun setupFavoriteButton() {
+        binding.favoriteButton.setOnClickListener {
+            viewModel.onFavoriteClicked()
+        }
+    }
+
+
     private fun observeViewModel() = binding.apply {
-        viewModel.playerState.observe(viewLifecycleOwner) { state ->
-            when (state) {
+        viewModel.screenState.observe(viewLifecycleOwner) { state ->
+            when (state.playerState) {
                 PlayerState.Playing -> {
                     playButton.setImageResource(R.drawable.ic_pause)
                     playButton.isEnabled = true
@@ -137,10 +145,10 @@ class PlayerFragment : Fragment() {
                     playButton.isEnabled = false
                 }
             }
-        }
-
-        viewModel.currentPosition.observe(viewLifecycleOwner) { position ->
-            trackProgress.text = viewModel.getFormattedTime(position)
+            trackProgress.text = viewModel.getFormattedTime(state.currentPosition)
+            favoriteButton.setImageResource(
+                if (state.isFavorite) R.drawable.ic_favorite_51 else R.drawable.ic_favorite_border
+            )
         }
     }
 

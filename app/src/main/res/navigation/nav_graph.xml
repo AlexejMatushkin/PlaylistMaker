@@ -28,4 +28,13 @@
         android:name="com.practicum.playlistmaker.ui.player.fragment.PlayerFragment"
         android:label="Player" />
 
+    <fragment
+        android:id="@+id/favoriteTracksFragment"
+        android:name="com.practicum.playlistmaker.ui.mediaLibrary.fragment.FavoriteTracksFragment"
+        android:label="FavoriteTracks">
+        <action
+            android:id="@+id/action_favoriteTracksFragment_to_playerFragment"
+            app:destination="@id/playerFragment" />
+    </fragment>
+
 </navigation>
