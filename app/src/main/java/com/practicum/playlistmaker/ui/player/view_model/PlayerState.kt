@@ -7,3 +7,9 @@ sealed class PlayerState {
     object Paused : PlayerState()
     object Error : PlayerState()
 }
+
+data class PlayerScreenState(
+    val playerState: PlayerState = PlayerState.Default,
+    val currentPosition: Long = 0,
+    val isFavorite: Boolean = false
+)
