@@ -28,8 +28,13 @@ class RootActivity : AppCompatActivity() {
         binding.bottomNavigationView.setupWithNavController(navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.playerFragment) {
-                binding.bottomNavigationView.visibility = View.GONE
+            when (destination.id) {
+                R.id.playerFragment, R.id.createPlaylistFragment -> {
+                    binding.bottomNavigationView.visibility = View.GONE
+                }
+                else -> {
+                    binding.bottomNavigationView.visibility = View.VISIBLE
+                }
             }
         }
 
@@ -40,7 +45,8 @@ class RootActivity : AppCompatActivity() {
             val keypadHeight = screenHeight - rect.bottom
             val isKeyboardVisible = keypadHeight > screenHeight * 0.15
 
-            if (navController.currentDestination?.id != R.id.playerFragment) {
+            val currentDest = navController.currentDestination?.id
+            if (currentDest != R.id.playerFragment && currentDest != R.id.createPlaylistFragment) {
                 binding.bottomNavigationView.visibility = if (isKeyboardVisible) View.GONE else View.VISIBLE
             }
         }

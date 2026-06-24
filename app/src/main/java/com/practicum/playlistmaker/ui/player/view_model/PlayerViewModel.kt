@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.favorite.interactor.FavoriteInteractor
 import com.practicum.playlistmaker.domain.media.MediaPlayerRepository
+import com.practicum.playlistmaker.domain.playlist.interactor.PlaylistInteractor
+import com.practicum.playlistmaker.domain.playlist.model.Playlist
 import com.practicum.playlistmaker.domain.search.models.Track
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -14,11 +16,18 @@ import java.util.Locale
 
 class PlayerViewModel(
     private val mediaPlayerRepository: MediaPlayerRepository,
-    private val favoriteInteractor: FavoriteInteractor
+    private val favoriteInteractor: FavoriteInteractor,
+    private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
     private val _screenState = MutableLiveData(PlayerScreenState())
     val screenState: LiveData<PlayerScreenState> = _screenState
+
+    private val _playlistState = MutableLiveData<PlaylistSheetState>(PlaylistSheetState.Hidden)
+    val playlistState: LiveData<PlaylistSheetState> = _playlistState
+
+    private val _addTrackResult = MutableLiveData<AddTrackResult?>()
+    val addTrackResult: LiveData<AddTrackResult?> = _addTrackResult
 
     private var playerState: PlayerState = PlayerState.Default
     private var currentPosition: Long = 0
@@ -35,7 +44,6 @@ class PlayerViewModel(
     private var playbackPosition = 0
     private var progressUpdateJob: Job? = null
     private var currentTrack: Track? = null
-
 
     fun loadTrack(track: Track) {
         currentTrack = track
@@ -59,6 +67,43 @@ class PlayerViewModel(
             }
             updateScreenState()
         }
+    }
+
+    fun loadPlaylistsForSheet() {
+        viewModelScope.launch {
+            playlistInteractor.getAllPlaylists().collect { playlists ->
+                if (playlists.isEmpty()) {
+                    _playlistState.value = PlaylistSheetState.Empty
+                } else {
+                    _playlistState.value = PlaylistSheetState.Content(playlists)
+                }
+            }
+        }
+    }
+
+    fun showSheet() {
+        _playlistState.value = PlaylistSheetState.Loading
+        loadPlaylistsForSheet()
+    }
+
+    fun hideSheet() {
+        _playlistState.value = PlaylistSheetState.Hidden
+    }
+
+    fun addTrackToPlaylist(playlist: Playlist) {
+        val track = currentTrack ?: return
+        viewModelScope.launch {
+            if (playlist.trackIds.contains(track.trackId)) {
+                _addTrackResult.value = AddTrackResult.AlreadyInPlaylist(playlist.name)
+            } else {
+                playlistInteractor.addTrackToPlaylist(playlist, track)
+                _addTrackResult.value = AddTrackResult.Added(playlist.name)
+            }
+        }
+    }
+
+    fun clearAddTrackResult() {
+        _addTrackResult.value = null
     }
 
     private fun preparePlayer() {
@@ -120,13 +165,8 @@ class PlayerViewModel(
 
     fun togglePlay() {
         when (playerState) {
-            PlayerState.Playing -> {
-                pause()
-            }
-            PlayerState.Prepared, PlayerState.Paused -> {
-                play()
-            }
-            PlayerState.Default -> {}
+            PlayerState.Playing -> pause()
+            PlayerState.Prepared, PlayerState.Paused -> play()
             else -> {}
         }
     }
@@ -174,4 +214,16 @@ class PlayerViewModel(
     companion object {
         private const val PROGRESS_UPDATE_INTERVAL_MS = 300L
     }
+}
+
+sealed interface PlaylistSheetState {
+    data object Hidden : PlaylistSheetState
+    data object Loading : PlaylistSheetState
+    data object Empty : PlaylistSheetState
+    data class Content(val playlists: List<Playlist>) : PlaylistSheetState
+}
+
+sealed interface AddTrackResult {
+    data class Added(val playlistName: String) : AddTrackResult
+    data class AlreadyInPlaylist(val playlistName: String) : AddTrackResult
 }

@@ -5,18 +5,25 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
+import com.practicum.playlistmaker.domain.playlist.model.Playlist
 import com.practicum.playlistmaker.domain.search.models.Track
+import com.practicum.playlistmaker.ui.mediaLibrary.adapter.PlaylistPlayerAdapter
+import com.practicum.playlistmaker.ui.player.view_model.AddTrackResult
 import com.practicum.playlistmaker.ui.player.view_model.PlayerState
+import com.practicum.playlistmaker.ui.player.view_model.PlaylistSheetState
 import com.practicum.playlistmaker.ui.player.view_model.PlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -25,6 +32,8 @@ class PlayerFragment : Fragment() {
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
     private val viewModel: PlayerViewModel by viewModel()
+
+    private var playerAdapter: PlaylistPlayerAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPlayerBinding.inflate(inflater, container, false)
@@ -61,6 +70,9 @@ class PlayerFragment : Fragment() {
         setupBackButton()
         setupPlayButton()
         setupFavoriteButton()
+        setupAddToPlaylistButton()
+        viewModel.hideSheet()
+        setupBottomSheet()
         observeViewModel()
     }
 
@@ -125,6 +137,46 @@ class PlayerFragment : Fragment() {
         }
     }
 
+    private fun setupAddToPlaylistButton() {
+        binding.addToPlaylistButton.setOnClickListener {
+            viewModel.showSheet()
+        }
+    }
+
+    private fun setupBottomSheet() {
+        binding.overlay.visibility = View.GONE
+
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.playlistsBottomSheet).apply {
+            state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
+        bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.overlay.visibility = View.GONE
+                    }
+                    else -> {
+                        binding.overlay.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                binding.overlay.alpha = if (slideOffset > 0) slideOffset else 0f
+            }
+        })
+
+        binding.newPlaylistButton.setOnClickListener {
+            findNavController().navigate(R.id.action_playerFragment_to_createPlaylistFragment)
+        }
+
+        playerAdapter = PlaylistPlayerAdapter(emptyList()) { playlist ->
+            viewModel.addTrackToPlaylist(playlist)
+        }
+        binding.playlistSheetRecycler.adapter = playerAdapter
+        binding.playlistSheetRecycler.layoutManager = LinearLayoutManager(requireContext())
+    }
 
     private fun observeViewModel() = binding.apply {
         viewModel.screenState.observe(viewLifecycleOwner) { state ->
@@ -149,6 +201,54 @@ class PlayerFragment : Fragment() {
             favoriteButton.setImageResource(
                 if (state.isFavorite) R.drawable.ic_favorite_51 else R.drawable.ic_favorite_border
             )
+        }
+
+        viewModel.playlistState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is PlaylistSheetState.Hidden -> {
+                    val behavior = BottomSheetBehavior.from(binding.playlistsBottomSheet)
+                    behavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
+                is PlaylistSheetState.Loading -> {}
+                is PlaylistSheetState.Empty -> {
+                    playerAdapter = PlaylistPlayerAdapter(emptyList()) { }
+                    binding.playlistSheetRecycler.adapter = playerAdapter
+                    val behavior = BottomSheetBehavior.from(binding.playlistsBottomSheet)
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+                is PlaylistSheetState.Content -> {
+                    playerAdapter = PlaylistPlayerAdapter(state.playlists) { playlist ->
+                        viewModel.addTrackToPlaylist(playlist)
+                    }
+                    binding.playlistSheetRecycler.adapter = playerAdapter
+                    val behavior = BottomSheetBehavior.from(binding.playlistsBottomSheet)
+                    behavior.state = BottomSheetBehavior.STATE_EXPANDED
+                }
+            }
+        }
+
+        viewModel.addTrackResult.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is AddTrackResult.Added -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.added_to_playlist, result.playlistName),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    val behavior = BottomSheetBehavior.from(binding.playlistsBottomSheet)
+                    behavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    viewModel.clearAddTrackResult()
+                }
+                is AddTrackResult.AlreadyInPlaylist -> {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.already_in_playlist, result.playlistName),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    viewModel.clearAddTrackResult()
+                }
+                null -> {}
+            }
         }
     }
 

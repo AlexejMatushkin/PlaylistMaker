@@ -1,7 +1,7 @@
 package com.practicum.playlistmaker.domain.search.models
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Locale
 
