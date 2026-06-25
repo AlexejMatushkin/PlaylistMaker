@@ -17,7 +17,9 @@ import com.practicum.playlistmaker.data.theme.impl.ThemeManagerImpl
 import com.practicum.playlistmaker.domain.favorite.impl.FavoriteTracksRepositoryImpl
 import com.practicum.playlistmaker.domain.favorite.repository.FavoriteTracksRepository
 import com.practicum.playlistmaker.domain.media.MediaPlayerRepository
+import com.practicum.playlistmaker.data.playlist.PlaylistImageRepositoryImpl
 import com.practicum.playlistmaker.domain.playlist.impl.PlaylistRepositoryImpl
+import com.practicum.playlistmaker.domain.playlist.repository.PlaylistImageRepository
 import com.practicum.playlistmaker.domain.playlist.repository.PlaylistRepository
 import com.practicum.playlistmaker.domain.search.repository.SearchHistoryRepository
 import com.practicum.playlistmaker.domain.search.repository.TracksRepository
@@ -102,5 +104,17 @@ val dataModule = module {
     single { get<AppDatabase>().playlistDao() }
     single { get<AppDatabase>().trackInPlaylistDao() }
 
-    single<PlaylistRepository> { PlaylistRepositoryImpl(get()) }
+    single<PlaylistRepository> {
+ PlaylistRepositoryImpl(
+        playlistDao = get(),
+        trackInPlaylistDao = get()
+    )
+}
+
+    single<PlaylistImageRepository> {
+        PlaylistImageRepositoryImpl(
+            contentResolver = androidContext().contentResolver,
+            filesDir = androidContext().getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES)!!
+        )
+    }
 }

@@ -1,20 +1,18 @@
 package com.practicum.playlistmaker.ui.createPlaylist
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
+import android.content.Context
 import android.os.Bundle
-import android.os.Environment
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -24,8 +22,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.File
-import java.io.FileOutputStream
 
 class CreatePlaylistFragment : Fragment() {
 
@@ -34,7 +30,6 @@ class CreatePlaylistFragment : Fragment() {
 
     private val viewModel: CreatePlaylistViewModel by viewModel()
 
-    private var savedImagePath: String? = null
     private var hasUnsavedData = false
 
     private val pickMedia = registerForActivityResult(
@@ -47,7 +42,7 @@ class CreatePlaylistFragment : Fragment() {
                 .placeholder(R.drawable.ic_add_photo_312)
                 .transform(CenterCrop(), RoundedCorners(dpToPx(8f)))
                 .into(binding.pickerImage)
-            savedImagePath = copyImageToPrivateStorage(uri)
+            viewModel.saveImage(uri.toString())
         }
     }
 
@@ -66,6 +61,7 @@ class CreatePlaylistFragment : Fragment() {
         setupToolbar()
         setupImagePicker()
         setupTextWatcher()
+        setupKeyboardActions()
         setupCreateButton()
         setupBackHandler()
         observeViewModel()
@@ -84,24 +80,27 @@ class CreatePlaylistFragment : Fragment() {
     }
 
     private fun setupTextWatcher() {
-        val watcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.onNameChanged(s?.toString() ?: "")
-                hasUnsavedData = true
-            }
-            override fun afterTextChanged(s: Editable?) {}
+        binding.nameEditText.doOnTextChanged { text, _, _, _ ->
+            viewModel.onNameChanged(text?.toString() ?: "")
+            hasUnsavedData = true
         }
-        binding.nameEditText.addTextChangedListener(watcher)
+        binding.descriptionEditText.doOnTextChanged { _, _, _, _ ->
+            hasUnsavedData = true
+        }
+    }
 
-        val descWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                hasUnsavedData = true
-            }
-            override fun afterTextChanged(s: Editable?) {}
+    private fun setupKeyboardActions() {
+        val hideKeyboard: (Int) -> Boolean = { actionId ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(binding.nameEditText.windowToken, 0)
+                binding.nameEditText.clearFocus()
+                binding.descriptionEditText.clearFocus()
+                true
+            } else false
         }
-        binding.descriptionEditText.addTextChangedListener(descWatcher)
+        binding.nameEditText.setOnEditorActionListener { _, actionId, _ -> hideKeyboard(actionId) }
+        binding.descriptionEditText.setOnEditorActionListener { _, actionId, _ -> hideKeyboard(actionId) }
     }
 
     private fun setupCreateButton() {
@@ -109,8 +108,7 @@ class CreatePlaylistFragment : Fragment() {
             val name = binding.nameEditText.text.toString()
             viewModel.createPlaylist(
                 name = name,
-                description = binding.descriptionEditText.text.toString(),
-                imagePath = savedImagePath ?: ""
+                description = binding.descriptionEditText.text.toString()
             )
             Toast.makeText(
                 requireContext(),
@@ -151,23 +149,6 @@ class CreatePlaylistFragment : Fragment() {
         viewModel.observeNameState().observe(viewLifecycleOwner) { state ->
             binding.createButton.isEnabled = !state.isEmpty
         }
-    }
-
-    private fun copyImageToPrivateStorage(uri: Uri): String {
-        val dir = File(
-            requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            "playlist_covers"
-        )
-        if (!dir.exists()) dir.mkdirs()
-
-        val file = File(dir, "cover_${System.currentTimeMillis()}.jpg")
-        val inputStream = requireActivity().contentResolver.openInputStream(uri)
-        val outputStream = FileOutputStream(file)
-        BitmapFactory.decodeStream(inputStream)
-            .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
-        outputStream.close()
-        inputStream?.close()
-        return file.absolutePath
     }
 
     private fun dpToPx(dp: Float): Int {

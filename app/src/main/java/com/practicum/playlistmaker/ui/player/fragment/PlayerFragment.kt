@@ -150,6 +150,11 @@ class PlayerFragment : Fragment() {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
 
+        binding.overlay.setOnClickListener {
+            val behavior = BottomSheetBehavior.from(binding.playlistsBottomSheet)
+            behavior.state = BottomSheetBehavior.STATE_HIDDEN
+        }
+
         bottomSheetBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 when (newState) {

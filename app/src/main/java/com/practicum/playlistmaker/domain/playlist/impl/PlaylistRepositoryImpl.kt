@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.domain.playlist.impl
 
-import com.practicum.playlistmaker.data.db.AppDatabase
+import com.practicum.playlistmaker.data.db.dao.PlaylistDao
+import com.practicum.playlistmaker.data.db.dao.TrackInPlaylistDao
 import com.practicum.playlistmaker.data.db.mapper.toDomain
 import com.practicum.playlistmaker.data.db.mapper.toEntity
 import com.practicum.playlistmaker.domain.playlist.model.Playlist
@@ -10,24 +11,26 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class PlaylistRepositoryImpl(
-    private val appDatabase: AppDatabase
+    private val playlistDao: PlaylistDao,
+    private val trackInPlaylistDao: TrackInPlaylistDao
 ) : PlaylistRepository {
 
     override suspend fun createPlaylist(playlist: Playlist) {
-        appDatabase.playlistDao().insertPlaylist(playlist.toEntity())
+        playlistDao.insertPlaylist(playlist.toEntity())
     }
 
     override fun getAllPlaylists(): Flow<List<Playlist>> {
-        return appDatabase.playlistDao().getAllPlaylists().map { list ->
+        return playlistDao.getAllPlaylists().map { list ->
             list.map { it.toDomain() }
         }
     }
 
     override suspend fun addTrackToPlaylist(playlist: Playlist, track: Track) {
-        playlist.trackIds.add(track.trackId)
-        val entity = playlist.toEntity().copy(count = playlist.trackIds.size)
-        appDatabase.playlistDao().updatePlaylist(entity)
-        appDatabase.trackInPlaylistDao().insertTrack(track.toTrackInPlaylistEntity())
+        val updatedTrackIds = playlist.trackIds + track.trackId
+        val updatedPlaylist = playlist.copy(trackIds = updatedTrackIds)
+        val entity = updatedPlaylist.toEntity().copy(count = updatedTrackIds.size)
+        playlistDao.updatePlaylist(entity)
+        trackInPlaylistDao.insertTrack(track.toTrackInPlaylistEntity())
     }
 }
 

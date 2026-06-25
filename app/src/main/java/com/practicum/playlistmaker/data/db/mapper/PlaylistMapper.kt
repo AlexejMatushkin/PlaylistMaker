@@ -21,6 +21,6 @@ fun PlaylistEntity.toDomain(): Playlist = Playlist(
     name = name,
     description = description,
     imagePath = imagePath,
-    trackIds = gson.fromJson(trackIdsJson, object : TypeToken<MutableList<Long>>() {}.type) ?: mutableListOf(),
+    trackIds = gson.fromJson(trackIdsJson, object : TypeToken<List<Long>>() {}.type) ?: emptyList(),
     count = count
 )
