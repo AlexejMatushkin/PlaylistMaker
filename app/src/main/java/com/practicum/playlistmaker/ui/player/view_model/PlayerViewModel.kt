@@ -43,6 +43,7 @@ class PlayerViewModel(
 
     private var playbackPosition = 0
     private var progressUpdateJob: Job? = null
+    private var playlistJob: Job? = null
     private var currentTrack: Track? = null
 
     fun loadTrack(track: Track) {
@@ -70,7 +71,8 @@ class PlayerViewModel(
     }
 
     fun loadPlaylistsForSheet() {
-        viewModelScope.launch {
+        playlistJob?.cancel()
+        playlistJob = viewModelScope.launch {
             playlistInteractor.getAllPlaylists().collect { playlists ->
                 if (playlists.isEmpty()) {
                     _playlistState.value = PlaylistSheetState.Empty
@@ -87,11 +89,13 @@ class PlayerViewModel(
     }
 
     fun hideSheet() {
+        playlistJob?.cancel()
         _playlistState.value = PlaylistSheetState.Hidden
     }
 
     fun addTrackToPlaylist(playlist: Playlist) {
         val track = currentTrack ?: return
+        playlistJob?.cancel()
         viewModelScope.launch {
             if (playlist.trackIds.contains(track.trackId)) {
                 _addTrackResult.value = AddTrackResult.AlreadyInPlaylist(playlist.name)

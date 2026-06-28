@@ -29,7 +29,7 @@ class PlaylistPlayerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             .load(playlist.imagePath.ifEmpty { null })
             .placeholder(R.drawable.ic_placeholder_103)
             .error(R.drawable.ic_placeholder_103)
-            .transform(CenterCrop(), RoundedCorners(dpToPx(2f, itemView.context)))
+            .transform(CenterCrop(), RoundedCorners(dpToPx(8f, itemView.context)))
             .into(cover)
     }
 

@@ -19,7 +19,7 @@
             android:id="@+id/playlistCover"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:scaleType="center"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_placeholder_103"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
