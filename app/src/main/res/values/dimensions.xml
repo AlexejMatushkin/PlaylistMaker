@@ -52,4 +52,17 @@
 
     <!-- Ширина имени исполнителя -->
     <dimen name="track_artist_width">54dp</dimen>
+
+    <dimen name="corner_radius_8">8dp</dimen>
+
+    <dimen name="text_size_11">11sp</dimen>
+    <dimen name="text_size_12">12sp</dimen>
+    <dimen name="text_size_13">13sp</dimen>
+    <dimen name="text_size_small">16sp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_small_8">8dp</dimen>
+
+    <dimen name="minHeight">56dp</dimen>
+    <dimen name="imageSize_medium">45dp</dimen>
+    <dimen name="paddingHorizontal_small">16dp</dimen>
 </resources>

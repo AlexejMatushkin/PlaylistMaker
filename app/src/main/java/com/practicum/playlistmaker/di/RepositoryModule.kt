@@ -4,6 +4,9 @@ import com.practicum.playlistmaker.domain.favorite.impl.FavoriteTracksRepository
 import com.practicum.playlistmaker.domain.favorite.interactor.FavoriteInteractor
 import com.practicum.playlistmaker.domain.favorite.interactor.FavoriteInteractorImpl
 import com.practicum.playlistmaker.domain.favorite.repository.FavoriteTracksRepository
+import com.practicum.playlistmaker.domain.playlist.interactor.PlaylistInteractor
+import com.practicum.playlistmaker.domain.playlist.interactor.PlaylistInteractorImpl
+import com.practicum.playlistmaker.domain.playlist.repository.PlaylistRepository
 import com.practicum.playlistmaker.domain.search.impl.SearchHistoryInteractorImpl
 import com.practicum.playlistmaker.domain.search.impl.TracksInteractorImpl
 import com.practicum.playlistmaker.domain.search.interactor.SearchHistoryInteractor
@@ -36,4 +39,6 @@ val repositoryModule = module {
 
     single<FavoriteTracksRepository> { FavoriteTracksRepositoryImpl(get()) }
     factory<FavoriteInteractor> { FavoriteInteractorImpl(get()) }
+
+    factory<PlaylistInteractor> { PlaylistInteractorImpl(get()) }
 }

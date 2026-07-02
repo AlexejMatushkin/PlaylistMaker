@@ -8,6 +8,8 @@
         <item name="colorOnSurface">@color/black_main</item>
         <item name="colorOnSurfaceVariant">@color/gray</item>
         <item name="android:windowBackground">@color/white</item>
+        <item name="buttonUpdateTint">@color/black_main</item>
+        <item name="buttonUpdateText">@color/white</item>
     </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
