@@ -76,4 +76,21 @@
         <item quantity="many">%d треков</item>
         <item quantity="other">%d треков</item>
     </plurals>
+
+    <string name="tracks_count_text">Количество треков</string>
+    <string name="share">Поделиться</string>
+    <string name="delete_track_title">Хотите удалить трек?</string>
+    <string name="delete_track_message"></string>
+    <string name="no">НЕТ</string>
+    <string name="yes">ДА</string>
+    <string name="share_playlist_empty">В этом плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="edit_info">Редактировать информацию</string>
+    <string name="delete_playlist">Удалить плейлист</string>
+    <string name="delete_playlist_title">Удалить плейлист</string>
+    <string name="delete_playlist_message">Хотите удалить плейлист\n«%s»?</string>
+    <string name="delete_mes">Удалить</string>
+    <string name="empty_playlist_mes">В этом плейлисте нет треков</string>
+    <string name="save">Сохранить</string>
+    <string name="playlist_saved">Плейлист сохранён</string>
+    <string name="edit_playlist">Редактировать</string>
 </resources>

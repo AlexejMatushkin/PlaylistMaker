@@ -65,4 +65,8 @@
     <dimen name="minHeight">56dp</dimen>
     <dimen name="imageSize_medium">45dp</dimen>
     <dimen name="paddingHorizontal_small">16dp</dimen>
+
+    <!-- Размеры для карточки плейлиста -->
+    <dimen name="margin_12">12dp</dimen>
+    <dimen name="padding_24">24dp</dimen>
 </resources>

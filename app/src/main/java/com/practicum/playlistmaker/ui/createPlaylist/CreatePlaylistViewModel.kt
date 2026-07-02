@@ -9,15 +9,15 @@ import com.practicum.playlistmaker.domain.playlist.model.Playlist
 import com.practicum.playlistmaker.domain.playlist.repository.PlaylistImageRepository
 import kotlinx.coroutines.launch
 
-class CreatePlaylistViewModel(
-    private val interactor: PlaylistInteractor,
+open class CreatePlaylistViewModel(
+    protected val interactor: PlaylistInteractor,
     private val imageRepository: PlaylistImageRepository
 ) : ViewModel() {
 
     private val nameStateLiveData = MutableLiveData<NameState>()
     fun observeNameState(): LiveData<NameState> = nameStateLiveData
 
-    private val savedImagePath = MutableLiveData<String?>()
+    protected val savedImagePath = MutableLiveData<String?>()
     fun observeSavedImagePath(): LiveData<String?> = savedImagePath
 
     fun onNameChanged(name: String) {
@@ -28,7 +28,7 @@ class CreatePlaylistViewModel(
         savedImagePath.postValue(imageRepository.saveImageToPrivateStorage(uriString))
     }
 
-    fun createPlaylist(name: String, description: String) {
+    open fun createPlaylist(name: String, description: String) {
         viewModelScope.launch {
             val playlist = Playlist(
                 name = name,
