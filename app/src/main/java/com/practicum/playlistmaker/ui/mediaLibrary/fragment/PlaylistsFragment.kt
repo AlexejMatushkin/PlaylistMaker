@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.practicum.playlistmaker.domain.playlist.model.Playlist
+import com.practicum.playlistmaker.ui.playlist.PlaylistFragment
 import com.practicum.playlistmaker.ui.mediaLibrary.adapter.PlaylistAdapter
 import com.practicum.playlistmaker.ui.mediaLibrary.viewModel.PlaylistState
 import com.practicum.playlistmaker.ui.mediaLibrary.viewModel.PlaylistsViewModel
@@ -72,7 +73,7 @@ class PlaylistsFragment : Fragment() {
         adapter = PlaylistAdapter(playlists) { playlist ->
             findNavController().navigate(
                 R.id.action_libraryFragment_to_playlistFragment,
-                bundleOf("playlistId" to playlist.id)
+                bundleOf(PlaylistFragment.ARG_PLAYLIST_ID to playlist.id)
             )
         }
         binding.recyclerView.adapter = adapter

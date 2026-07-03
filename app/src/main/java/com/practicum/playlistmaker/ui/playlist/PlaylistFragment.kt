@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -222,7 +223,11 @@ class PlaylistFragment : Fragment() {
             binding.description.visibility = View.GONE
         }
 
-        binding.time.text = state.totalDuration
+        binding.time.text = resources.getQuantityString(
+            R.plurals.playlist_duration_minutes,
+            state.totalMinutes,
+            state.totalMinutes
+        )
 
         val trackCount = playlist.count
         binding.count.text = resources.getQuantityString(
@@ -241,6 +246,18 @@ class PlaylistFragment : Fragment() {
                 RoundedCorners(dpToPx(8f))
             )
             .into(binding.image)
+
+        if (playlist.imagePath.isNotEmpty()) {
+            binding.imageBackground.visibility = View.VISIBLE
+            val params = binding.name.layoutParams as ConstraintLayout.LayoutParams
+            params.topToBottom = R.id.imageBackground
+            binding.name.requestLayout()
+        } else {
+            binding.imageBackground.visibility = View.GONE
+            val params = binding.name.layoutParams as ConstraintLayout.LayoutParams
+            params.topToBottom = R.id.image
+            binding.name.requestLayout()
+        }
 
         if (state.tracks.isEmpty()) {
             Toast.makeText(requireContext(), R.string.empty_playlist_mes, Toast.LENGTH_SHORT).show()

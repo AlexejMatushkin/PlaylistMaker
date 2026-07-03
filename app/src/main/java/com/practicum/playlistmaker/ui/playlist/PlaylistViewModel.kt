@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 data class PlaylistState(
     val playlist: Playlist? = null,
     val tracks: List<Track> = emptyList(),
-    val totalDuration: String = ""
+    val totalMinutes: Int = 0
 )
 
 class PlaylistViewModel(
@@ -40,21 +40,16 @@ class PlaylistViewModel(
                                 .mapNotNull { it.trackTimeMillis }
                                 .sum()
                             val totalMinutes = (durationSum / 1000 / 60).toInt()
-                            val formattedDuration = when {
-                                totalMinutes % 10 == 1 && totalMinutes % 100 != 11 -> "$totalMinutes минута"
-                                totalMinutes % 10 in 2..4 && totalMinutes % 100 !in 12..14 -> "$totalMinutes минуты"
-                                else -> "$totalMinutes минут"
-                            }
                             stateLiveData.value = PlaylistState(
                                 playlist = playlist,
                                 tracks = tracks,
-                                totalDuration = formattedDuration
+                                totalMinutes = totalMinutes
                             )
                         }
                     } else {
                         stateLiveData.value = PlaylistState(
                             playlist = playlist,
-                            totalDuration = "0 минут"
+                            totalMinutes = 0
                         )
                     }
                 }

@@ -11,6 +11,7 @@ import com.practicum.playlistmaker.domain.playlist.model.Playlist
 import com.practicum.playlistmaker.domain.playlist.repository.PlaylistRepository
 import com.practicum.playlistmaker.domain.search.models.Track
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -26,17 +27,20 @@ class PlaylistRepositoryImpl(
     override fun getAllPlaylists(): Flow<List<Playlist>> {
         return playlistDao.getAllPlaylists().map { list ->
             list.map { it.toDomain() }
-        }
+        }.distinctUntilChanged()
     }
 
     override fun getPlaylistById(id: Int): Flow<Playlist?> {
-        return playlistDao.getPlaylistById(id).map { it?.toDomain() }
+        return playlistDao.getPlaylistById(id).map { it?.toDomain() }.distinctUntilChanged()
     }
 
     override fun getTracksByIds(ids: List<Long>): Flow<List<Track>> {
         return trackInPlaylistDao.getAllTracks().map { list ->
-            list.filter { it.trackId in ids }.map { it.toTrackDomain() }
-        }
+            val idOrder = ids.withIndex().associate { (index, id) -> id to index }
+            list.filter { it.trackId in idOrder }
+                .sortedBy { idOrder[it.trackId] }
+                .map { it.toTrackDomain() }
+        }.distinctUntilChanged()
     }
 
     override suspend fun addTrackToPlaylist(playlist: Playlist, track: Track) {
