@@ -25,15 +25,25 @@ class TrackAdapter(
         fun onItemClick(track: Track)
     }
 
+    interface OnItemLongClickListener {
+        fun onItemLongClick(track: Track): Boolean
+    }
+
     private var onItemClickListener: OnItemClickListener? = null
+    private var onItemLongClickListener: OnItemLongClickListener? = null
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         this.onItemClickListener = listener
     }
 
+    fun setOnItemLongClickListener(listener: OnItemLongClickListener) {
+        this.onItemLongClickListener = listener
+    }
+
     class TrackViewHolder(
         itemView: View,
-        private val onItemClickListener: OnItemClickListener?
+        private val onItemClickListener: OnItemClickListener?,
+        private val onItemLongClickListener: OnItemLongClickListener?
     ) : RecyclerView.ViewHolder(itemView) {
         private val tvTrackName: TextView = itemView.findViewById(R.id.tvTrackName)
         private val tvArtistName: TextView = itemView.findViewById(R.id.tvArtistName)
@@ -65,6 +75,9 @@ class TrackAdapter(
             itemView.setOnClickListener {
                 onItemClickListener?.onItemClick(track)
             }
+            itemView.setOnLongClickListener {
+                onItemLongClickListener?.onItemLongClick(track) ?: false
+            }
         }
 
     }
@@ -72,7 +85,7 @@ class TrackAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_track, parent, false)
-        return TrackViewHolder(view, onItemClickListener)
+        return TrackViewHolder(view, onItemClickListener, onItemLongClickListener)
     }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {

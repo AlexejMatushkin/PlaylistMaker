@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.practicum.playlistmaker.domain.playlist.model.Playlist
+import com.practicum.playlistmaker.ui.playlist.PlaylistFragment
 import com.practicum.playlistmaker.ui.mediaLibrary.adapter.PlaylistAdapter
 import com.practicum.playlistmaker.ui.mediaLibrary.viewModel.PlaylistState
 import com.practicum.playlistmaker.ui.mediaLibrary.viewModel.PlaylistsViewModel
@@ -68,7 +70,12 @@ class PlaylistsFragment : Fragment() {
     private fun showContent(playlists: List<Playlist>) {
         binding.emptyLibrary.visibility = View.GONE
         binding.recyclerView.visibility = View.VISIBLE
-        adapter = PlaylistAdapter(playlists)
+        adapter = PlaylistAdapter(playlists) { playlist ->
+            findNavController().navigate(
+                R.id.action_libraryFragment_to_playlistFragment,
+                bundleOf(PlaylistFragment.ARG_PLAYLIST_ID to playlist.id)
+            )
+        }
         binding.recyclerView.adapter = adapter
     }
 

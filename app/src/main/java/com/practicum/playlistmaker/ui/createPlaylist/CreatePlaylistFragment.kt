@@ -23,16 +23,16 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentCreatePlaylistBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class CreatePlaylistFragment : Fragment() {
+open class CreatePlaylistFragment : Fragment() {
 
     private var _binding: FragmentCreatePlaylistBinding? = null
-    private val binding get() = _binding!!
+    protected val binding get() = _binding!!
 
-    private val viewModel: CreatePlaylistViewModel by viewModel()
+    protected open val viewModel: CreatePlaylistViewModel by viewModel()
 
     private var hasUnsavedData = false
 
-    private val pickMedia = registerForActivityResult(
+    protected val pickMedia = registerForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
@@ -67,13 +67,13 @@ class CreatePlaylistFragment : Fragment() {
         observeViewModel()
     }
 
-    private fun setupToolbar() {
+    protected open fun setupToolbar() {
         binding.menuButton.setNavigationOnClickListener {
             handleBackPress()
         }
     }
 
-    private fun setupImagePicker() {
+    protected open fun setupImagePicker() {
         binding.pickerImage.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
@@ -103,7 +103,7 @@ class CreatePlaylistFragment : Fragment() {
         binding.descriptionEditText.setOnEditorActionListener { _, actionId, _ -> hideKeyboard(actionId) }
     }
 
-    private fun setupCreateButton() {
+    protected open fun setupCreateButton() {
         binding.createButton.setOnClickListener {
             val name = binding.nameEditText.text.toString()
             viewModel.createPlaylist(
@@ -130,7 +130,7 @@ class CreatePlaylistFragment : Fragment() {
         )
     }
 
-    private fun handleBackPress() {
+    protected open fun handleBackPress() {
         if (hasUnsavedData) {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.finish_create_pl)
@@ -145,13 +145,13 @@ class CreatePlaylistFragment : Fragment() {
         }
     }
 
-    private fun observeViewModel() {
+    protected open fun observeViewModel() {
         viewModel.observeNameState().observe(viewLifecycleOwner) { state ->
             binding.createButton.isEnabled = !state.isEmpty
         }
     }
 
-    private fun dpToPx(dp: Float): Int {
+    protected fun dpToPx(dp: Float): Int {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             dp,
