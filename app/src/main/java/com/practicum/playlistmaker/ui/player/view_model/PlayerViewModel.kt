@@ -1,9 +1,11 @@
 package com.practicum.playlistmaker.ui.player.view_model
 
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.practicum.playlistmaker.domain.favorite.interactor.FavoriteInteractor
 import com.practicum.playlistmaker.domain.media.MediaPlayerRepository
 import com.practicum.playlistmaker.domain.playlist.interactor.PlaylistInteractor
@@ -17,7 +19,8 @@ import java.util.Locale
 class PlayerViewModel(
     private val mediaPlayerRepository: MediaPlayerRepository,
     private val favoriteInteractor: FavoriteInteractor,
-    private val playlistInteractor: PlaylistInteractor
+    private val playlistInteractor: PlaylistInteractor,
+    private val firebaseAnalytics: FirebaseAnalytics
 ) : ViewModel() {
 
     private val _screenState = MutableLiveData(PlayerScreenState())
@@ -65,6 +68,8 @@ class PlayerViewModel(
             } else {
                 favoriteInteractor.addToFavorites(track)
                 isFavorite = true
+                val bundle = bundleOf("track_name" to track.trackName)
+                firebaseAnalytics.logEvent("track_added_to_favorites", bundle)
             }
             updateScreenState()
         }
