@@ -26,6 +26,9 @@ import com.practicum.playlistmaker.domain.search.repository.TracksRepository
 import com.practicum.playlistmaker.domain.settings.repository.SettingsRepository
 import com.practicum.playlistmaker.domain.sharing.ExternalNavigator
 import com.practicum.playlistmaker.domain.theme.interactor.ThemeManager
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -35,6 +38,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 private const val BASE_URL = "https://itunes.apple.com"
 
 val dataModule = module {
+
+    // ============= FIREBASE =============
+    single<FirebaseAnalytics> { Firebase.analytics }
 
     // ============= NETWORK =============
     single {
