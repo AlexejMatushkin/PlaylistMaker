@@ -126,7 +126,7 @@ class PlayerFragment : Fragment() {
     }
 
     private fun setupPlayButton() {
-        binding.playButton.setOnClickListener {
+        binding.playButton.onPlayButtonClickListener = {
             viewModel.togglePlay()
         }
     }
@@ -187,15 +187,15 @@ class PlayerFragment : Fragment() {
         viewModel.screenState.observe(viewLifecycleOwner) { state ->
             when (state.playerState) {
                 PlayerState.Playing -> {
-                    playButton.setImageResource(R.drawable.ic_pause)
+                    playButton.setPlayingState(true)
                     playButton.isEnabled = true
                 }
                 PlayerState.Prepared, PlayerState.Paused -> {
-                    playButton.setImageResource(R.drawable.ic_play_circle)
+                    playButton.setPlayingState(false)
                     playButton.isEnabled = true
                 }
                 PlayerState.Default -> {
-                    playButton.setImageResource(R.drawable.ic_play_circle)
+                    playButton.setPlayingState(false)
                     playButton.isEnabled = true
                 }
                 PlayerState.Error -> {
