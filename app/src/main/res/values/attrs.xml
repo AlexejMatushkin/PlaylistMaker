@@ -2,4 +2,10 @@
 <resources>
     <attr name="buttonUpdateTint" format="color" />
     <attr name="buttonUpdateText" format="color" />
+
+    <declare-styleable name="PlaybackButtonView">
+        <attr name="playDrawable" format="reference" />
+        <attr name="pauseDrawable" format="reference" />
+        <attr name="tint" format="color" />
+    </declare-styleable>
 </resources>
