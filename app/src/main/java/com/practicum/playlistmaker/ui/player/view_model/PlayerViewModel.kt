@@ -40,6 +40,7 @@ class PlayerViewModel(
     private var playlistJob: Job? = null
     private var currentTrack: Track? = null
     private var playerController: PlayerController? = null
+    private var isAppInBackgrounded = false
 
     fun onServiceConnected(controller: PlayerController) {
         playerController = controller
@@ -58,6 +59,9 @@ class PlayerViewModel(
                         playerState = PlayerState.Prepared
                         currentPosition = 0
                         stopProgressUpdates()
+                        if (isAppInBackgrounded) {
+                            playerController?.hideNotification()
+                        }
                         updateScreenState()
                     },
                     onError = {
@@ -75,8 +79,6 @@ class PlayerViewModel(
             isFavorite = favoriteInteractor.isFavorite(track.trackId)
             updateScreenState()
         }
-        releasePlayer()
-        preparePlayer()
     }
 
     fun onFavoriteClicked() {
@@ -136,12 +138,14 @@ class PlayerViewModel(
     }
 
     fun onAppBackgrounded() {
+        isAppInBackgrounded = true
         if (playerState == PlayerState.Playing) {
             playerController?.showNotification()
         }
     }
 
     fun onAppForegrounded() {
+        isAppInBackgrounded = false
         playerController?.hideNotification()
     }
 
@@ -187,6 +191,7 @@ class PlayerViewModel(
         playbackPosition = 0
         playerState = PlayerState.Default
         currentPosition = 0
+        isAppInBackgrounded = false
         updateScreenState()
         stopProgressUpdates()
     }
@@ -225,6 +230,9 @@ class PlayerViewModel(
                     playerState = PlayerState.Prepared
                     currentPosition = 0
                     stopProgressUpdates()
+                    if (isAppInBackgrounded) {
+                        playerController?.hideNotification()
+                    }
                     updateScreenState()
                 },
                 onError = {

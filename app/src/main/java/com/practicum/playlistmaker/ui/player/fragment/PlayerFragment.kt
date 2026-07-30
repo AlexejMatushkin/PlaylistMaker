@@ -51,10 +51,7 @@ class PlayerFragment : Fragment() {
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            bindPlayerService()
-        }
+    ) { _ ->
     }
 
     private val serviceConnection = object : ServiceConnection {
@@ -116,18 +113,15 @@ class PlayerFragment : Fragment() {
     }
 
     private fun requestNotificationPermissionAndBind() {
+        bindPlayerService()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     requireContext(),
                     Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
+                ) != PackageManager.PERMISSION_GRANTED
             ) {
-                bindPlayerService()
-            } else {
                 notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
-        } else {
-            bindPlayerService()
         }
     }
 
