@@ -1,11 +1,20 @@
 package com.practicum.playlistmaker.ui.player.fragment
 
+import android.Manifest
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
@@ -17,7 +26,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.data.player.service.PlayerService
 import com.practicum.playlistmaker.databinding.FragmentPlayerBinding
+import com.practicum.playlistmaker.domain.media.PlayerController
 import com.practicum.playlistmaker.domain.playlist.model.Playlist
 import com.practicum.playlistmaker.domain.search.models.Track
 import com.practicum.playlistmaker.ui.mediaLibrary.adapter.PlaylistPlayerAdapter
@@ -34,6 +45,31 @@ class PlayerFragment : Fragment() {
     private val viewModel: PlayerViewModel by viewModel()
 
     private var playerAdapter: PlaylistPlayerAdapter? = null
+    private var playerController: PlayerController? = null
+    private var isBound = false
+    private var currentTrack: Track? = null
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            bindPlayerService()
+        }
+    }
+
+    private val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as PlayerService.PlayerBinder
+            playerController = binder.getService()
+            isBound = true
+            viewModel.onServiceConnected(binder.getService())
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            playerController = null
+            isBound = false
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentPlayerBinding.inflate(inflater, container, false)
@@ -64,6 +100,7 @@ class PlayerFragment : Fragment() {
             return
         }
 
+        currentTrack = track
         viewModel.loadTrack(track)
 
         setupViews(track)
@@ -74,6 +111,34 @@ class PlayerFragment : Fragment() {
         viewModel.hideSheet()
         setupBottomSheet()
         observeViewModel()
+
+        requestNotificationPermissionAndBind()
+    }
+
+    private fun requestNotificationPermissionAndBind() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                bindPlayerService()
+            } else {
+                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            bindPlayerService()
+        }
+    }
+
+    private fun bindPlayerService() {
+        val track = currentTrack ?: return
+        val intent = Intent(requireContext(), PlayerService::class.java).apply {
+            putExtra(PlayerService.EXTRA_URL, track.previewUrl.orEmpty())
+            putExtra(PlayerService.EXTRA_ARTIST_NAME, track.artistName)
+            putExtra(PlayerService.EXTRA_TRACK_NAME, track.trackName)
+        }
+        requireContext().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
 
     private fun setupViews(track: Track) = binding.apply {
@@ -257,13 +322,22 @@ class PlayerFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.onAppForegrounded()
+    }
+
     override fun onPause() {
         super.onPause()
-        viewModel.pause()
+        viewModel.onAppBackgrounded()
     }
 
     override fun onDestroyView() {
         viewModel.releasePlayer()
+        if (isBound) {
+            requireContext().unbindService(serviceConnection)
+            isBound = false
+        }
         _binding = null
         super.onDestroyView()
     }

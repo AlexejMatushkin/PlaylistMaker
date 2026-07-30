@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.practicum.playlistmaker.domain.favorite.interactor.FavoriteInteractor
-import com.practicum.playlistmaker.domain.media.MediaPlayerRepository
+import com.practicum.playlistmaker.domain.media.PlayerController
 import com.practicum.playlistmaker.domain.playlist.interactor.PlaylistInteractor
 import com.practicum.playlistmaker.domain.playlist.model.Playlist
 import com.practicum.playlistmaker.domain.search.models.Track
@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 class PlayerViewModel(
-    private val mediaPlayerRepository: MediaPlayerRepository,
     private val favoriteInteractor: FavoriteInteractor,
     private val playlistInteractor: PlaylistInteractor,
     private val firebaseAnalytics: FirebaseAnalytics
@@ -36,18 +35,39 @@ class PlayerViewModel(
     private var currentPosition: Long = 0
     private var isFavorite: Boolean = false
 
-    private fun updateScreenState() {
-        _screenState.value = PlayerScreenState(
-            playerState = playerState,
-            currentPosition = currentPosition,
-            isFavorite = isFavorite
-        )
-    }
-
     private var playbackPosition = 0
     private var progressUpdateJob: Job? = null
     private var playlistJob: Job? = null
     private var currentTrack: Track? = null
+    private var playerController: PlayerController? = null
+
+    fun onServiceConnected(controller: PlayerController) {
+        playerController = controller
+        currentTrack?.let { track ->
+            track.previewUrl?.let { url ->
+                controller.prepare(
+                    url = url,
+                    onPrepared = {
+                        playerState = PlayerState.Prepared
+                        if (playbackPosition > 0) {
+                            controller.seekTo(playbackPosition)
+                        }
+                        updateScreenState()
+                    },
+                    onCompletion = {
+                        playerState = PlayerState.Prepared
+                        currentPosition = 0
+                        stopProgressUpdates()
+                        updateScreenState()
+                    },
+                    onError = {
+                        playerState = PlayerState.Error
+                        updateScreenState()
+                    }
+                )
+            }
+        }
+    }
 
     fun loadTrack(track: Track) {
         currentTrack = track
@@ -115,47 +135,25 @@ class PlayerViewModel(
         _addTrackResult.value = null
     }
 
-    private fun preparePlayer() {
-        val previewUrl = currentTrack?.previewUrl
-        if (previewUrl.isNullOrBlank()) {
-            playerState = PlayerState.Error
-            updateScreenState()
-            return
+    fun onAppBackgrounded() {
+        if (playerState == PlayerState.Playing) {
+            playerController?.showNotification()
         }
+    }
 
-        playerState = PlayerState.Default
-        updateScreenState()
-
-        mediaPlayerRepository.preparePlayer(
-            url = previewUrl,
-            onPrepared = {
-                playerState = PlayerState.Prepared
-                if (playbackPosition > 0) {
-                    mediaPlayerRepository.seekTo(playbackPosition)
-                }
-                updateScreenState()
-            },
-            onCompletion = {
-                playerState = PlayerState.Prepared
-                currentPosition = 0
-                stopProgressUpdates()
-                updateScreenState()
-            },
-            onError = {
-                playerState = PlayerState.Error
-                updateScreenState()
-            }
-        )
+    fun onAppForegrounded() {
+        playerController?.hideNotification()
     }
 
     fun play() {
-        if (mediaPlayerRepository.isPlaying()) return
+        val controller = playerController ?: return
+        if (controller.isPlaying()) return
 
         if (playerState == PlayerState.Prepared || playerState == PlayerState.Paused) {
             if (playbackPosition > 0) {
-                mediaPlayerRepository.seekTo(playbackPosition)
+                controller.seekTo(playbackPosition)
             }
-            mediaPlayerRepository.play()
+            controller.play()
             playerState = PlayerState.Playing
             updateScreenState()
             startProgressUpdates()
@@ -163,9 +161,10 @@ class PlayerViewModel(
     }
 
     fun pause() {
-        if (mediaPlayerRepository.isPlaying()) {
-            playbackPosition = mediaPlayerRepository.getCurrentPosition()
-            mediaPlayerRepository.pause()
+        val controller = playerController ?: return
+        if (controller.isPlaying()) {
+            playbackPosition = controller.getCurrentPosition()
+            controller.pause()
             playerState = PlayerState.Paused
             updateScreenState()
             stopProgressUpdates()
@@ -181,7 +180,10 @@ class PlayerViewModel(
     }
 
     fun releasePlayer() {
-        mediaPlayerRepository.release()
+        playerController?.let { controller ->
+            controller.hideNotification()
+            controller.release()
+        }
         playbackPosition = 0
         playerState = PlayerState.Default
         currentPosition = 0
@@ -189,12 +191,56 @@ class PlayerViewModel(
         stopProgressUpdates()
     }
 
+    private fun updateScreenState() {
+        _screenState.value = PlayerScreenState(
+            playerState = playerState,
+            currentPosition = currentPosition,
+            isFavorite = isFavorite
+        )
+    }
+
+    private fun preparePlayer() {
+        val track = currentTrack
+        val previewUrl = track?.previewUrl
+        if (previewUrl.isNullOrBlank()) {
+            playerState = PlayerState.Error
+            updateScreenState()
+            return
+        }
+
+        playerState = PlayerState.Default
+        updateScreenState()
+
+        playerController?.let { controller ->
+            controller.prepare(
+                url = previewUrl,
+                onPrepared = {
+                    playerState = PlayerState.Prepared
+                    if (playbackPosition > 0) {
+                        controller.seekTo(playbackPosition)
+                    }
+                    updateScreenState()
+                },
+                onCompletion = {
+                    playerState = PlayerState.Prepared
+                    currentPosition = 0
+                    stopProgressUpdates()
+                    updateScreenState()
+                },
+                onError = {
+                    playerState = PlayerState.Error
+                    updateScreenState()
+                }
+            )
+        }
+    }
+
     private fun startProgressUpdates() {
         stopProgressUpdates()
         progressUpdateJob = viewModelScope.launch {
             while (true) {
-                if (mediaPlayerRepository.isPlaying()) {
-                    currentPosition = mediaPlayerRepository.getCurrentPosition().toLong()
+                if (playerController?.isPlaying() == true) {
+                    currentPosition = playerController?.getCurrentPosition()?.toLong() ?: 0
                     updateScreenState()
                 }
                 delay(PROGRESS_UPDATE_INTERVAL_MS)

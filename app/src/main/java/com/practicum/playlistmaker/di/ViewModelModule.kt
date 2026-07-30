@@ -30,7 +30,11 @@ val viewModelModule = module {
     }
 
     viewModel {
-        PlayerViewModel(get(), get(), get(), get())
+        PlayerViewModel(
+            favoriteInteractor = get(),
+            playlistInteractor = get(),
+            firebaseAnalytics = get()
+        )
     }
 
     viewModel { MediaLibraryViewModel() }
