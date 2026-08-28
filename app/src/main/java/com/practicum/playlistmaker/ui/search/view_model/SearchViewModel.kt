@@ -25,6 +25,9 @@ class SearchViewModel(
     private val _historyState = MutableLiveData<SearchHistoryState>()
     val historyState: LiveData<SearchHistoryState> = _historyState
 
+    private val _query = MutableLiveData("")
+    val query: LiveData<String> = _query
+
     private var lastQuery = ""
     private var clickJob: Job? = null
 
@@ -104,6 +107,20 @@ class SearchViewModel(
     fun clearSearch() {
         _searchState.value = SearchState.Empty
         lastQuery = ""
+    }
+
+    fun updateQuery(text: String) {
+        _query.value = text
+        if (text.isNotEmpty()) {
+            searchWithDebounce(text)
+        } else {
+            clearSearch()
+            loadHistory()
+        }
+    }
+
+    fun clearQuery() {
+        updateQuery("")
     }
 
     fun retryLastSearch() {
