@@ -4,63 +4,60 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import com.google.android.material.tabs.TabLayoutMediator
+import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.FragmentMediaLibraryBinding
-import com.practicum.playlistmaker.ui.mediaLibrary.adapter.MediaLibraryPagerAdapter
-import com.practicum.playlistmaker.ui.mediaLibrary.viewModel.MediaLibraryViewModel
+import com.practicum.playlistmaker.ui.mediaLibrary.MediaLibraryScreen
+import com.practicum.playlistmaker.ui.mediaLibrary.viewModel.FavoriteTracksViewModel
+import com.practicum.playlistmaker.ui.mediaLibrary.viewModel.PlaylistsViewModel
+import com.practicum.playlistmaker.ui.player.fragment.PlayerFragment
+import com.practicum.playlistmaker.ui.playlist.PlaylistFragment
+import com.practicum.playlistmaker.ui.theme.PlaylistMakerTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MediaLibraryFragment : Fragment() {
 
-    private var _binding: FragmentMediaLibraryBinding? = null
-    private val binding get() = _binding!!
-    private var tabMediator: TabLayoutMediator? = null
-    private val viewModel: MediaLibraryViewModel by viewModel()
+    private val favoriteTracksViewModel: FavoriteTracksViewModel by viewModel()
+    private val playlistsViewModel: PlaylistsViewModel by viewModel()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _binding = FragmentMediaLibraryBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.updatePadding(
-                left = systemBars.left,
-                top = systemBars.top,
-                right = systemBars.right,
-                bottom = systemBars.bottom
-            )
-            insets
-        }
-
-        setupTabs()
-    }
-
-    private fun setupTabs() {
-        val pagerAdapter = MediaLibraryPagerAdapter(requireActivity())
-        binding.viewPager.adapter = pagerAdapter
-
-        tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-            tab.text = when (position) {
-                0 -> getString(R.string.favorite_tracks)
-                1 -> getString(R.string.playlists)
-                else -> ""
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                PlaylistMakerTheme {
+                    MediaLibraryScreen(
+                        favoriteTracksViewModel = favoriteTracksViewModel,
+                        playlistsViewModel = playlistsViewModel,
+                        onCreatePlaylist = {
+                            findNavController().navigate(R.id.action_libraryFragment_to_createPlaylistFragment)
+                        },
+                        onPlaylistClick = { playlist ->
+                            findNavController().navigate(
+                                R.id.action_libraryFragment_to_playlistFragment,
+                                bundleOf(PlaylistFragment.ARG_PLAYLIST_ID to playlist.id)
+                            )
+                        },
+                        onTrackClick = { track ->
+                            val bundle = Bundle().apply {
+                                putParcelable(PlayerFragment.EXTRA_TRACK, track)
+                            }
+                            findNavController().navigate(R.id.playerFragment, bundle)
+                        }
+                    )
+                }
             }
         }
-        tabMediator?.attach()
     }
 
-    override fun onDestroyView() {
-        tabMediator?.detach()
-        _binding = null
-        super.onDestroyView()
+    override fun onResume() {
+        super.onResume()
+        playlistsViewModel.loadPlaylists()
     }
 }
